@@ -93,9 +93,19 @@ const RegisterOwner = () => {
               <h3 className="font-black text-gray-900 uppercase tracking-widest text-xs">Turf Info</h3>
               <input name="turfName" required onChange={onChange} className="w-full p-4 rounded-2xl bg-gray-50" placeholder="Turf Name" />
               <input name="turfAddress" required onChange={onChange} className="w-full p-4 rounded-2xl bg-gray-50" placeholder="Turf Address" />
-              <select name="area" onChange={onChange} className="w-full p-4 rounded-2xl bg-gray-50">
-                {['Uttara', 'Mirpur', 'Banani', 'Gulshan', 'Dhanmondi'].map(a => <option key={a} value={a}>{a}</option>)}
-              </select>
+              <div className="grid grid-cols-2 gap-4">
+                <select name="area" onChange={onChange} className="w-full p-4 rounded-2xl bg-gray-50">
+                  {['Uttara', 'Mirpur', 'Banani', 'Gulshan', 'Dhanmondi'].map(a => <option key={a} value={a}>{a}</option>)}
+                </select>
+                <select name="sportTypes" onChange={onChange} className="w-full p-4 rounded-2xl bg-gray-50">
+                  <option value="Football">Football</option>
+                  <option value="Cricket">Cricket</option>
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <input name="openingTime" type="time" onChange={onChange} value={formData.openingTime} className="w-full p-4 rounded-2xl bg-gray-50" />
+                <input name="closingTime" type="time" onChange={onChange} value={formData.closingTime} className="w-full p-4 rounded-2xl bg-gray-50" />
+              </div>
               <input name="pricePerHour" type="number" required onChange={onChange} className="w-full p-4 rounded-2xl bg-gray-50" placeholder="Price Per Hour" />
             </div>
           </div>

@@ -3,7 +3,17 @@ import { useSelector } from 'react-redux';
 import Navbar from '@/components/layout/Navbar';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
-// ... rest of imports
+// Pages
+import Home from '@/pages/Home';
+import Login from '@/pages/auth/Login';
+import Register from '@/pages/auth/Register';
+import RegisterPlayer from '@/pages/auth/RegisterPlayer';
+import RegisterOwner from '@/pages/auth/RegisterOwner';
+import TurfListing from '@/pages/turf/TurfListing';
+import TurfDetails from '@/pages/turf/TurfDetails';
+import UserDashboard from '@/pages/dashboard/UserDashboard';
+import OwnerDashboard from '@/pages/dashboard/OwnerDashboard';
+import AdminDashboard from '@/pages/dashboard/AdminDashboard';
 
 const DashboardRedirect = () => {
   const { user } = useSelector((state) => state.auth);

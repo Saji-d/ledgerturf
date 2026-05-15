@@ -76,9 +76,9 @@ const UserDashboard = () => {
                     <Calendar className="w-8 h-8 text-primary" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">{booking.turf?.name}</h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-1">{booking.turf?.name || 'Deleted Turf'}</h3>
                     <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-                      <span className="flex items-center"><MapPin className="w-4 h-4 mr-1 text-primary" /> {booking.turf?.location?.area || 'Dhaka'}</span>
+                      <span className="flex items-center"><MapPin className="w-4 h-4 mr-1 text-primary" /> {booking.turf?.location?.area || 'N/A'}</span>
                       <span className="flex items-center font-bold text-gray-900"><Clock className="w-4 h-4 mr-1 text-primary" /> {new Date(booking.date).toLocaleDateString()} @ {booking.startTime}</span>
                     </div>
                   </div>

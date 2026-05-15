@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import turfService from '@/services/turfService';
 import bookingService from '@/services/bookingService';
 import { toast } from 'react-hot-toast';
-import { MapPin, Info, Calendar, Clock, CheckCircle, Loader2, ArrowLeft } from 'lucide-react';
+import { MapPin, Info, Calendar, Clock, CheckCircle, Loader2, ArrowLeft, Star } from 'lucide-react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import PaymentModal from '@/components/booking/PaymentModal';
@@ -209,7 +209,7 @@ const TurfDetails = () => {
         isOpen={isPaymentOpen} 
         onClose={() => setIsPaymentOpen(false)} 
         onConfirm={onPaymentConfirm} 
-        amount={turf.pricePerHour} 
+        amount={turf?.pricePerHour || 0} 
       />
     </div>
   );

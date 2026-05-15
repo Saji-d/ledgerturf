@@ -18,7 +18,9 @@ const TurfListing = () => {
     try {
       const params = Object.fromEntries([...searchParams]);
       const res = await turfService.getTurfs(params);
-      setTurfs(res.data);
+      if (res.success) {
+        setTurfs(res.data);
+      }
     } catch (error) {
       console.error(error);
     } finally {
