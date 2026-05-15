@@ -7,6 +7,7 @@ const connectDB = require('./config/db');
 const errorMiddleware = require('./middleware/errorMiddleware');
 const authRoutes = require('./routes/authRoutes');
 const turfRoutes = require('./routes/turfRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
 
 // Load environment variables
 dotenv.config();
@@ -31,6 +32,7 @@ app.get('/', (req, res) => {
 // Mount routers
 app.use('/api/auth', authRoutes);
 app.use('/api/turfs', turfRoutes);
+app.use('/api/bookings', bookingRoutes);
 
 // Error handling middleware
 app.use(errorMiddleware);
