@@ -1,16 +1,17 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import Navbar from '@/components/layout/Navbar';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
-// Pages
-import Home from '@/pages/Home';
-import Login from '@/pages/auth/Login';
-import Register from '@/pages/auth/Register';
-import TurfListing from '@/pages/turf/TurfListing';
-import TurfDetails from '@/pages/turf/TurfDetails';
-import UserDashboard from '@/pages/dashboard/UserDashboard';
-import OwnerDashboard from '@/pages/dashboard/OwnerDashboard';
-import AdminDashboard from '@/pages/dashboard/AdminDashboard';
+// ... rest of imports
+
+const DashboardRedirect = () => {
+  const { user } = useSelector((state) => state.auth);
+  if (!user) return <Navigate to="/login" />;
+  if (user.role === 'superAdmin') return <Navigate to="/dashboard/admin" />;
+  if (user.role === 'turfOwner') return <Navigate to="/dashboard/owner" />;
+  return <Navigate to="/dashboard/player" />;
+};
 
 function App() {
   return (
@@ -23,22 +24,24 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/register/player" element={<RegisterPlayer />} />
+            <Route path="/register/owner" element={<RegisterOwner />} />
             <Route path="/turfs" element={<TurfListing />} />
             <Route path="/turfs/:id" element={<TurfDetails />} />
 
-            {/* User Routes */}
-            <Route element={<ProtectedRoute allowedRoles={['user', 'turfOwner', 'superAdmin']} />}>
-              <Route path="/dashboard" element={<UserDashboard />} />
+            {/* Role-Specific Protected Routes */}
+            <Route path="/dashboard" element={<DashboardRedirect />} />
+            
+            <Route element={<ProtectedRoute allowedRoles={['player', 'user', 'turfOwner', 'superAdmin']} />}>
+              <Route path="/dashboard/player" element={<UserDashboard />} />
             </Route>
 
-            {/* Turf Owner Routes */}
-            <Route element={<ProtectedRoute allowedRoles={['turfOwner']} />}>
-              <Route path="/owner/dashboard" element={<OwnerDashboard />} />
+            <Route element={<ProtectedRoute allowedRoles={['turfOwner', 'superAdmin']} />}>
+              <Route path="/dashboard/owner" element={<OwnerDashboard />} />
             </Route>
 
-            {/* Admin Routes */}
             <Route element={<ProtectedRoute allowedRoles={['superAdmin']} />}>
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/dashboard/admin" element={<AdminDashboard />} />
             </Route>
           </Routes>
         </main>

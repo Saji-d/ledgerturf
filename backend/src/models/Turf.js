@@ -46,6 +46,14 @@ const turfSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'Please add a price per hour'],
     },
+    openingTime: {
+      type: String,
+      default: '06:00',
+    },
+    closingTime: {
+      type: String,
+      default: '23:00',
+    },
     images: {
       type: [String],
       default: [],

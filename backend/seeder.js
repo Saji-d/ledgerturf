@@ -2,94 +2,95 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const User = require('./src/models/User');
 const Turf = require('./src/models/Turf');
-const { USER_ROLES, TURF_STATUS } = require('./src/utils/constants');
+const Booking = require('./src/models/Booking');
+const { USER_ROLES, TURF_STATUS, BOOKING_STATUS } = require('./src/utils/constants');
 
 dotenv.config();
 
 mongoose.connect(process.env.MONGO_URI);
 
+const areas = ['Uttara', 'Mirpur', 'Banani', 'Dhanmondi', 'Gulshan', 'Bashundhara', 'Mohammadpur', 'Badda'];
+const sports = [['Football'], ['Cricket'], ['Football', 'Cricket']];
+
 const seedData = async () => {
   try {
-    // Clear existing data
     await User.deleteMany();
     await Turf.deleteMany();
+    await Booking.deleteMany();
 
     // Create SuperAdmin
-    const admin = await User.create({
+    await User.create({
       name: 'Super Admin',
       email: 'admin@ledgerturf.com',
       password: 'password123',
+      phone: '01700000000',
       role: USER_ROLES.SUPER_ADMIN,
     });
 
-    // Create Turf Owners
-    const owner1 = await User.create({
-      name: 'Uttara Turf Owner',
-      email: 'owner1@gmail.com',
+    // Create 5 Owners
+    const owners = [];
+    for (let i = 1; i <= 5; i++) {
+      const owner = await User.create({
+        name: `Owner ${i}`,
+        email: `owner${i}@gmail.com`,
+        password: 'password123',
+        phone: `0180000000${i}`,
+        role: USER_ROLES.TURF_OWNER,
+      });
+      owners.push(owner);
+    }
+
+    // Create 15 Turfs
+    const turfs = [];
+    for (let i = 1; i <= 15; i++) {
+      const area = areas[i % areas.length];
+      const sport = sports[i % sports.length];
+      const turf = await Turf.create({
+        owner: owners[i % owners.length]._id,
+        name: `${area} ${sport[0]} ${i > 8 ? 'Arena' : 'Club'}`,
+        description: `Premium ${sport.join(' and ')} facility in ${area}. Top-notch grass and lightning.`,
+        address: `${area} Road ${i}, Dhaka`,
+        location: {
+          type: 'Point',
+          coordinates: [90.35 + Math.random() * 0.1, 23.7 + Math.random() * 0.2],
+          city: 'Dhaka',
+          area: area,
+        },
+        sportTypes: sport,
+        pricePerHour: 1200 + (Math.floor(Math.random() * 10) * 100),
+        status: i % 5 === 0 ? TURF_STATUS.PENDING : TURF_STATUS.APPROVED,
+        isIndoor: i % 3 === 0,
+        averageRating: 4 + Math.random(),
+        openingTime: '06:00',
+        closingTime: '23:00',
+        images: [`https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=800&id=${i}`]
+      });
+      turfs.push(turf);
+    }
+
+    // Create a Test Player
+    const player = await User.create({
+      name: 'Test Player',
+      email: 'player@gmail.com',
       password: 'password123',
-      role: USER_ROLES.TURF_OWNER,
+      phone: '01900000000',
+      role: USER_ROLES.PLAYER,
     });
 
-    const owner2 = await User.create({
-      name: 'Banani Turf Owner',
-      email: 'owner2@gmail.com',
-      password: 'password123',
-      role: USER_ROLES.TURF_OWNER,
-    });
+    for (let i = 0; i < 5; i++) {
+      await Booking.create({
+        user: player._id,
+        turf: turfs[i]._id,
+        date: new Date(),
+        startTime: '18:00',
+        endTime: '19:00',
+        totalPrice: turfs[i].pricePerHour,
+        status: BOOKING_STATUS.CONFIRMED,
+        paymentStatus: 'paid',
+      });
+    }
 
-    // Create Turfs
-    await Turf.create([
-      {
-        owner: owner1._id,
-        name: 'Uttara Football Arena',
-        description: 'Premium artificial grass turf in the heart of Uttara.',
-        address: 'Sector 4, Uttara, Dhaka',
-        location: {
-          type: 'Point',
-          coordinates: [90.3994, 23.8759], // [lng, lat]
-          city: 'Dhaka',
-          area: 'Uttara',
-        },
-        sportTypes: ['Football'],
-        pricePerHour: 2000,
-        status: TURF_STATUS.APPROVED,
-        isIndoor: false,
-      },
-      {
-        owner: owner2._id,
-        name: 'Banani Cricket Ground',
-        description: 'Top quality indoor cricket facility.',
-        address: 'Road 11, Banani, Dhaka',
-        location: {
-          type: 'Point',
-          coordinates: [90.4071, 23.7937],
-          city: 'Dhaka',
-          area: 'Banani',
-        },
-        sportTypes: ['Cricket'],
-        pricePerHour: 1500,
-        status: TURF_STATUS.APPROVED,
-        isIndoor: true,
-      },
-      {
-        owner: owner1._id,
-        name: 'Mirpur Sports Complex',
-        description: 'Multi-sport turf for football and cricket.',
-        address: 'Mirpur 2, Dhaka',
-        location: {
-          type: 'Point',
-          coordinates: [90.3623, 23.8069],
-          city: 'Dhaka',
-          area: 'Mirpur',
-        },
-        sportTypes: ['Football', 'Cricket'],
-        pricePerHour: 1800,
-        status: TURF_STATUS.PENDING,
-        isIndoor: false,
-      },
-    ]);
-
-    console.log('Data Seeded Successfully!');
+    console.log('Seeded 1 Admin, 5 Owners, 15 Turfs (with images & roles), and 1 Player with bookings.');
     process.exit();
   } catch (error) {
     console.error('Error seeding data:', error);

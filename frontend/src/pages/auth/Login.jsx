@@ -24,15 +24,21 @@ const Login = () => {
   React.useEffect(() => {
     if (isError) {
       toast.error(message);
+      dispatch(reset());
     }
 
-    if (isSuccess || user) {
-      const from = location.state?.from?.pathname || '/';
-      navigate(from, { replace: true });
+    if (isSuccess && user) {
+      toast.success(`Welcome back, ${user.name}!`);
+      if (user.role === 'superAdmin') {
+        navigate('/dashboard/admin');
+      } else if (user.role === 'turfOwner') {
+        navigate('/dashboard/owner');
+      } else {
+        navigate('/dashboard/player');
+      }
+      dispatch(reset());
     }
-
-    dispatch(reset());
-  }, [user, isError, isSuccess, message, navigate, dispatch, location]);
+  }, [user, isError, isSuccess, message, navigate, dispatch]);
 
   const onChange = (e) => {
     setFormData((prevState) => ({

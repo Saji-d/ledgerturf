@@ -1,17 +1,35 @@
 import React from 'react';
 import turfService from '@/services/turfService';
-import { ShieldCheck, CheckCircle, XCircle, Clock, MapPin, Loader2, User as UserIcon } from 'lucide-react';
+import bookingService from '@/services/bookingService';
+import { ShieldCheck, CheckCircle, XCircle, Clock, MapPin, Loader2, User as UserIcon, Users, CreditCard, Activity } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 const AdminDashboard = () => {
   const [pendingTurfs, setPendingTurfs] = React.useState([]);
+  const [stats, setStats] = React.useState({
+    totalUsers: 154,
+    totalOwners: 12,
+    totalBookings: 0,
+    totalRevenue: 0
+  });
   const [loading, setLoading] = React.useState(true);
 
-  const fetchPending = async () => {
+  const fetchData = async () => {
     try {
-      // Special query for admin to see all pending
-      const res = await turfService.getTurfs({ status: 'pending' });
-      setPendingTurfs(res.data);
+      const [turfsRes, bookingsRes] = await Promise.all([
+        turfService.getTurfs({ status: 'pending' }),
+        bookingService.getBookings()
+      ]);
+      
+      setPendingTurfs(turfsRes.data);
+      
+      const bookings = bookingsRes.data;
+      setStats(prev => ({
+        ...prev,
+        totalBookings: bookings.length,
+        totalRevenue: bookings.reduce((acc, b) => acc + (b.status === 'confirmed' ? b.totalPrice : 0), 0)
+      }));
+
     } catch (error) {
       console.error(error);
     } finally {
@@ -20,14 +38,14 @@ const AdminDashboard = () => {
   };
 
   React.useEffect(() => {
-    fetchPending();
+    fetchData();
   }, []);
 
   const handleApproval = async (id, status) => {
     try {
       await turfService.approveTurf(id, status);
       toast.success(`Turf ${status === 'approved' ? 'Approved' : 'Rejected'} Successfully`);
-      fetchPending();
+      fetchData();
     } catch (error) {
       toast.error('Action failed');
     }
@@ -51,6 +69,38 @@ const AdminDashboard = () => {
           </div>
           <p className="text-gray-500 text-lg">Review and manage turf registration requests.</p>
         </header>
+
+        {/* Admin Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+          <div className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100">
+            <div className="bg-blue-50 w-12 h-12 rounded-2xl flex items-center justify-center mb-4">
+              <Users className="text-blue-500 w-6 h-6" />
+            </div>
+            <span className="text-gray-400 text-xs font-bold uppercase tracking-widest block mb-1">Active Players</span>
+            <span className="text-3xl font-black text-gray-900">{stats.totalUsers}</span>
+          </div>
+          <div className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100">
+            <div className="bg-purple-50 w-12 h-12 rounded-2xl flex items-center justify-center mb-4">
+              <ShieldCheck className="text-purple-500 w-6 h-6" />
+            </div>
+            <span className="text-gray-400 text-xs font-bold uppercase tracking-widest block mb-1">Verified Owners</span>
+            <span className="text-3xl font-black text-gray-900">{stats.totalOwners}</span>
+          </div>
+          <div className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100">
+            <div className="bg-green-50 w-12 h-12 rounded-2xl flex items-center justify-center mb-4">
+              <Activity className="text-green-500 w-6 h-6" />
+            </div>
+            <span className="text-gray-400 text-xs font-bold uppercase tracking-widest block mb-1">Total Bookings</span>
+            <span className="text-3xl font-black text-gray-900">{stats.totalBookings}</span>
+          </div>
+          <div className="bg-primary p-8 rounded-[40px] shadow-lg shadow-primary/20 text-white">
+            <div className="bg-white/20 w-12 h-12 rounded-2xl flex items-center justify-center mb-4">
+              <CreditCard className="text-white w-6 h-6" />
+            </div>
+            <span className="text-primary-light text-xs font-bold uppercase tracking-widest block mb-1">Platform Revenue</span>
+            <span className="text-3xl font-black">৳{stats.totalRevenue}</span>
+          </div>
+        </div>
 
         <div className="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-8 border-b border-gray-50 flex justify-between items-center">

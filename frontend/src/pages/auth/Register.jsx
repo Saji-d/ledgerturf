@@ -59,7 +59,7 @@ const Register = () => {
           
           <div className="space-y-6">
             <div 
-              onClick={() => setFormData(p => ({...p, role: 'user'}))}
+              onClick={() => navigate('/register/player')}
               className={`p-6 rounded-3xl border-2 transition cursor-pointer ${role === 'user' ? 'bg-white text-primary border-white' : 'border-white/20 hover:bg-white/10'}`}
             >
               <div className="flex items-center gap-4">
@@ -71,7 +71,7 @@ const Register = () => {
               </div>
             </div>
             <div 
-              onClick={() => setFormData(p => ({...p, role: 'turfOwner'}))}
+              onClick={() => navigate('/register/owner')}
               className={`p-6 rounded-3xl border-2 transition cursor-pointer ${role === 'turfOwner' ? 'bg-white text-primary border-white' : 'border-white/20 hover:bg-white/10'}`}
             >
               <div className="flex items-center gap-4">

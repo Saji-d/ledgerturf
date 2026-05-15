@@ -1,0 +1,295 @@
+You are now upgrading LedgerTurf from a frontend prototype into a production-style MERN SaaS application.
+
+Implement ALL of the following improvements across backend, frontend, MongoDB schemas, API routes, dashboards, and UI logic.
+
+========================
+
+1. ROLE-BASED AUTH SYSTEM
+   ========================
+
+Separate the system into 3 roles:
+
+* PLAYER
+* TURF_OWNER
+* SUPER_ADMIN
+
+Update:
+
+* auth middleware
+* JWT payloads
+* protected routes
+* frontend redirects
+
+After login:
+
+* PLAYER -> /dashboard/player
+* TURF_OWNER -> /dashboard/owner
+* SUPER_ADMIN -> /dashboard/admin
+
+Create proper role guards for routes.
+
+========================
+2. SEPARATE REGISTRATION FLOWS
+==============================
+
+Create:
+
+/register/player
+/register/owner
+
+PLAYER registration fields:
+
+* full name
+* email
+* password
+* phone
+
+OWNER registration fields:
+
+* owner name
+* email
+* password
+* phone
+* turf/business name
+* turf address
+* Google Maps location
+* sports type
+* opening time
+* closing time
+* price per hour
+* turf description
+* multiple turf images upload
+
+========================
+3. TURF APPROVAL SYSTEM
+=======================
+
+Add approval workflow.
+
+Turf schema must include:
+
+* status:
+
+  * pending
+  * approved
+  * rejected
+
+When owner submits turf:
+
+* save as pending
+* NOT visible publicly
+
+SUPER_ADMIN dashboard must show:
+
+* pending turf requests
+* turf images
+* owner info
+* approve button
+* reject button
+
+Only approved turfs appear publicly.
+
+========================
+4. DUMMY DATA / SEEDING
+=======================
+
+Create realistic dummy turf data for Dhaka areas:
+
+* Uttara
+* Mirpur
+* Banani
+* Dhanmondi
+* Gulshan
+* Bashundhara
+* Mohammadpur
+* Badda
+
+Each turf must contain:
+
+* real-looking turf name
+* images
+* coordinates
+* sports supported
+* ratings
+* price
+* available slots
+* description
+* owner info
+
+Seed at least 15 realistic turfs into MongoDB.
+
+========================
+5. FUNCTIONAL SEARCH SYSTEM
+===========================
+
+Implement REAL filtering and search.
+
+Search must work by:
+
+* area
+* sport type
+* price range
+* rating
+* availability
+* nearby location
+
+Use:
+
+* MongoDB query filtering
+* URL search params
+* debounced frontend search
+
+========================
+6. GOOGLE MAPS INTEGRATION
+==========================
+
+Improve map functionality.
+
+Requirements:
+
+* show all approved turfs on map
+* clickable markers
+* user current location
+* nearby turf suggestions
+* route distance calculation
+* location-based filtering
+
+========================
+7. PLAYER DASHBOARD
+===================
+
+Build a proper player dashboard showing:
+
+* upcoming bookings
+* booking history
+* favorite turfs
+* payment history
+* profile settings
+
+========================
+8. OWNER DASHBOARD
+==================
+
+Build advanced owner dashboard:
+
+* all listed turfs
+* booking analytics
+* revenue stats
+* slot management
+* booking calendar
+* edit turf details
+* upload turf images
+* pending approval status
+
+========================
+9. ADMIN DASHBOARD
+==================
+
+Build a powerful admin panel:
+
+* approve/reject turfs
+* manage users
+* delete fake listings
+* dashboard analytics
+* total bookings
+* total revenue
+* active users
+* active owners
+
+========================
+10. SLOT BOOKING SYSTEM
+=======================
+
+Implement FULL real-time slot booking logic.
+
+Requirements:
+
+* selectable dates
+* selectable time slots
+* prevent double booking
+* booked slots disabled
+* booking confirmation
+* booking cancellation
+* concurrency-safe booking logic
+
+========================
+11. PAYMENT SIMULATION
+======================
+
+Improve payment flow:
+
+* bKash UI
+* Nagad UI
+* Card UI
+
+Add:
+
+* fake payment processing
+* booking only completes after successful payment
+
+========================
+12. LANDING PAGE IMPROVEMENTS
+=============================
+
+Fix homepage buttons and interactions.
+
+Requirements:
+
+* “Find Turf” should navigate properly
+* “Book a Turf” should work
+* “List Your Turf” should open owner onboarding
+* area cards should filter turfs
+* search bar must function
+* all CTAs should navigate correctly
+
+========================
+13. BETTER UI/UX
+================
+
+Improve overall polish:
+
+* skeleton loaders
+* empty states
+* animations
+* responsive design
+* toast notifications
+* loading states
+* error handling
+* hover states
+
+========================
+14. BACKEND IMPROVEMENTS
+========================
+
+Improve backend architecture:
+
+* validation
+* centralized error handling
+* pagination
+* secure auth
+* rate limiting
+* image upload handling
+* optimized MongoDB queries
+
+========================
+15. FINAL GOAL
+==============
+
+Transform LedgerTurf into a realistic production-style turf booking SaaS suitable for:
+
+* university capstone
+* portfolio showcase
+* deployment demo
+
+Do NOT just create UI placeholders.
+
+Implement real backend logic, MongoDB models, API routes, protected dashboards, and working functionality throughout the application.
+
+After completion:
+
+* explain all new features
+* explain new routes
+* explain MongoDB schema changes
+* explain how to run seeders
+* explain how to use admin accounts
+* explain how to test bookings and approvals

@@ -1,5 +1,5 @@
 exports.USER_ROLES = {
-  USER: 'user',
+  PLAYER: 'player',
   TURF_OWNER: 'turfOwner',
   SUPER_ADMIN: 'superAdmin',
 };

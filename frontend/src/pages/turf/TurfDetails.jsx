@@ -22,50 +22,46 @@ const TurfDetails = () => {
   const [bookingLoading, setBookingLoading] = React.useState(false);
   const [isPaymentOpen, setIsPaymentOpen] = React.useState(false);
 
-  // ... (rest of methods)
+  const timeSlots = [
+    "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", 
+    "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", 
+    "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"
+  ];
 
-  const handleBookingClick = () => {
-    if (!user) {
-      toast.error('Please login to book a turf');
-      return navigate('/login', { state: { from: { pathname: `/turfs/${id}` } } });
-    }
-
-    if (!selectedSlot) return toast.error('Please select a time slot');
-    
-    setIsPaymentOpen(true);
-  };
-
-  const onPaymentConfirm = async () => {
-    setIsPaymentOpen(false);
-    setBookingLoading(true);
+  const fetchDetails = async () => {
+    setLoading(true);
     try {
-      const startTime = selectedSlot;
-      const [h, m] = startTime.split(':').map(Number);
-      const endTime = `${String(h + 1).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-      
-      const res = await bookingService.createBooking({
-        turf: id,
-        date: selectedDate.toISOString().split('T')[0],
-        startTime,
-        endTime
-      });
-
+      const res = await turfService.getTurf(id);
       if (res.success) {
-        toast.success('Booking Successful! ✅');
-        navigate('/dashboard');
+        setTurf(res.data);
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Booking failed');
+      console.error(error);
+      toast.error('Turf not found');
+      navigate('/turfs');
     } finally {
-      setBookingLoading(false);
+      setLoading(false);
     }
   };
 
-  if (loading) return (
-    <div className="flex items-center justify-center py-40">
-      <Loader2 className="w-12 h-12 text-primary animate-spin" />
-    </div>
-  );
+  const fetchAvailability = async () => {
+    if (!id || !selectedDate) return;
+    try {
+      const dateStr = selectedDate.toISOString().split('T')[0];
+      const res = await bookingService.getUnavailableSlots(id, dateStr);
+      setUnavailableSlots(res.data.map(b => b.startTime));
+    } catch (error) {
+      console.error('Could not fetch availability', error);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchDetails();
+  }, [id]);
+
+  React.useEffect(() => {
+    if (turf) fetchAvailability();
+  }, [turf, selectedDate]);
 
   return (
     <div className="bg-gray-50 min-h-screen pb-20">

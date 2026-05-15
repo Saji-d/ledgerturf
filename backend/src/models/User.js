@@ -17,6 +17,10 @@ const userSchema = new mongoose.Schema(
         'Please add a valid email',
       ],
     },
+    phone: {
+      type: String,
+      required: [true, 'Please add a phone number'],
+    },
     password: {
       type: String,
       required: [true, 'Please add a password'],
@@ -26,7 +30,7 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       enum: Object.values(USER_ROLES),
-      default: USER_ROLES.USER,
+      default: USER_ROLES.PLAYER,
     },
   },
   {
