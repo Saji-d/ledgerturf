@@ -7,6 +7,7 @@ import { toast } from 'react-hot-toast';
 import { MapPin, Info, Calendar, Clock, CheckCircle, Loader2, ArrowLeft } from 'lucide-react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import PaymentModal from '@/components/booking/PaymentModal';
 
 const TurfDetails = () => {
   const { id } = useParams();
@@ -19,52 +20,23 @@ const TurfDetails = () => {
   const [unavailableSlots, setUnavailableSlots] = React.useState([]);
   const [selectedSlot, setSelectedSlot] = React.useState(null);
   const [bookingLoading, setBookingLoading] = React.useState(false);
+  const [isPaymentOpen, setIsPaymentOpen] = React.useState(false);
 
-  // Example slots (usually would come from a turf schedule config)
-  const timeSlots = [
-    "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", 
-    "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", 
-    "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"
-  ];
+  // ... (rest of methods)
 
-  const fetchDetails = async () => {
-    try {
-      const res = await turfService.getTurf(id);
-      setTurf(res.data);
-    } catch (error) {
-      toast.error('Turf not found');
-      navigate('/turfs');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchAvailability = async () => {
-    try {
-      const dateStr = selectedDate.toISOString().split('T')[0];
-      const res = await bookingService.getUnavailableSlots(id, dateStr);
-      setUnavailableSlots(res.data.map(b => b.startTime));
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  React.useEffect(() => {
-    fetchDetails();
-  }, [id]);
-
-  React.useEffect(() => {
-    if (turf) fetchAvailability();
-  }, [turf, selectedDate]);
-
-  const handleBooking = async () => {
+  const handleBookingClick = () => {
     if (!user) {
       toast.error('Please login to book a turf');
       return navigate('/login', { state: { from: { pathname: `/turfs/${id}` } } });
     }
 
     if (!selectedSlot) return toast.error('Please select a time slot');
+    
+    setIsPaymentOpen(true);
+  };
 
+  const onPaymentConfirm = async () => {
+    setIsPaymentOpen(false);
     setBookingLoading(true);
     try {
       const startTime = selectedSlot;
@@ -224,7 +196,7 @@ const TurfDetails = () => {
 
                   <button 
                     disabled={bookingLoading}
-                    onClick={handleBooking}
+                    onClick={handleBookingClick}
                     className="w-full py-5 bg-primary text-white rounded-2xl font-extrabold text-lg hover:bg-primary-dark transition shadow-xl shadow-primary/30 flex items-center justify-center disabled:opacity-50"
                   >
                     {bookingLoading ? <Loader2 className="animate-spin" /> : 'Confirm Booking'}
@@ -236,6 +208,13 @@ const TurfDetails = () => {
           </div>
         </div>
       </div>
+      
+      <PaymentModal 
+        isOpen={isPaymentOpen} 
+        onClose={() => setIsPaymentOpen(false)} 
+        onConfirm={onPaymentConfirm} 
+        amount={turf.pricePerHour} 
+      />
     </div>
   );
 };

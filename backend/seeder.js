@@ -6,7 +6,7 @@ const { USER_ROLES, TURF_STATUS } = require('./src/utils/constants');
 
 dotenv.config();
 
-mongoose.connect(process.env.MONGODB_URI);
+mongoose.connect(process.env.MONGO_URI);
 
 const seedData = async () => {
   try {

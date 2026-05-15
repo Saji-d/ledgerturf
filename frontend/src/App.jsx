@@ -9,6 +9,8 @@ import Register from '@/pages/auth/Register';
 import TurfListing from '@/pages/turf/TurfListing';
 import TurfDetails from '@/pages/turf/TurfDetails';
 import UserDashboard from '@/pages/dashboard/UserDashboard';
+import OwnerDashboard from '@/pages/dashboard/OwnerDashboard';
+import AdminDashboard from '@/pages/dashboard/AdminDashboard';
 
 function App() {
   return (
@@ -29,14 +31,14 @@ function App() {
               <Route path="/dashboard" element={<UserDashboard />} />
             </Route>
 
-            {/* Turf Owner Routes (Placeholder for now) */}
-            <Route element={<ProtectedRoute allowedRoles={['turfOwner', 'superAdmin']} />}>
-              <Route path="/owner/dashboard" element={<UserDashboard />} />
+            {/* Turf Owner Routes */}
+            <Route element={<ProtectedRoute allowedRoles={['turfOwner']} />}>
+              <Route path="/owner/dashboard" element={<OwnerDashboard />} />
             </Route>
 
-            {/* Admin Routes (Placeholder for now) */}
+            {/* Admin Routes */}
             <Route element={<ProtectedRoute allowedRoles={['superAdmin']} />}>
-              <Route path="/admin/dashboard" element={<UserDashboard />} />
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
             </Route>
           </Routes>
         </main>
