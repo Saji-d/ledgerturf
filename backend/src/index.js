@@ -4,6 +4,9 @@ const cors = require('cors');
 const morgan = require('morgan');
 const connectDB = require('./config/db');
 
+const errorMiddleware = require('./middleware/errorMiddleware');
+const authRoutes = require('./routes/authRoutes');
+
 // Load environment variables
 dotenv.config();
 
@@ -24,15 +27,11 @@ app.get('/', (req, res) => {
   res.send('LedgerTurf API is running...');
 });
 
+// Mount routers
+app.use('/api/auth', authRoutes);
+
 // Error handling middleware
-app.use((err, req, res, next) => {
-  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-  res.status(statusCode);
-  res.json({
-    message: err.message,
-    stack: process.env.NODE_ENV === 'production' ? null : err.stack,
-  });
-});
+app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 5000;
 

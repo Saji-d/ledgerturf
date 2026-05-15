@@ -1,7 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit'
+import authReducer from './authSlice'
 
 export const store = configureStore({
   reducer: {
-    // Reducers will be added here in Phase 2
+    auth: authReducer,
   },
 })
