@@ -5,10 +5,9 @@ import api from '@/services/api';
 import MapComponent from '@/components/turf/MapComponent';
 import { 
   ShieldCheck, CheckCircle, XCircle, Clock, MapPin, Loader2, 
-  User as UserIcon, Users, CreditCard, Activity, Trash2, Edit, Save, X
+  User as UserIcon, Users, CreditCard, Activity, Trash2, Edit, Save, X, Info, Trophy
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import FormInput from '@/components/common/FormInput';
 
 const AdminDashboard = () => {
   const location = useLocation();
@@ -31,6 +30,7 @@ const AdminDashboard = () => {
   });
   const [loading, setLoading] = React.useState(true);
   const [selectedTurf, setSelectedTurf] = React.useState(null);
+  const [previewImg, setPreviewImg] = React.useState('');
   
   // Editing state
   const [editingUser, setEditingUser] = React.useState(null);
@@ -43,7 +43,7 @@ const AdminDashboard = () => {
         turfService.getTurfs({ status: 'pending' }),
         api.get('/admin/stats'),
         api.get('/admin/users'),
-        turfService.getTurfs({ status: 'approved', limit: 1 }) // Just to get total count
+        turfService.getTurfs({ status: 'approved', limit: 1 })
       ]);
       
       setPendingTurfs(turfsRes.data);
@@ -63,12 +63,29 @@ const AdminDashboard = () => {
     fetchData();
   }, []);
 
+  // Update preview image when selected turf changes
+  React.useEffect(() => {
+    if (selectedTurf) {
+      setPreviewImg(selectedTurf.images?.[0] || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=800');
+    }
+  }, [selectedTurf]);
+
   const handleApproval = async (id, status) => {
     try {
       await turfService.approveTurf(id, status);
       toast.success(`Turf ${status} successfully`);
-      setSelectedTurf(null);
-      fetchData();
+      
+      // Dynamic update: remove from pending list immediately
+      setPendingTurfs(prev => prev.filter(t => t._id !== id));
+      
+      // Clear selection if it was the one approved/rejected
+      if (selectedTurf?._id === id) setSelectedTurf(null);
+      
+      // Update global stats
+      setStats(prev => ({
+        ...prev,
+        totalActiveTurfs: status === 'approved' ? prev.totalActiveTurfs + 1 : prev.totalActiveTurfs
+      }));
     } catch (error) {
       toast.error('Action failed');
     }
@@ -79,7 +96,7 @@ const AdminDashboard = () => {
     try {
       await api.delete(`/admin/users/${id}`);
       toast.success('User deleted');
-      fetchData();
+      setAllUsers(prev => prev.filter(u => u._id !== id));
     } catch (error) {
       toast.error('Delete failed');
     }
@@ -95,7 +112,7 @@ const AdminDashboard = () => {
       await api.put(`/admin/users/${id}`, editFormData);
       toast.success('User updated');
       setEditingUser(null);
-      fetchData();
+      setAllUsers(prev => prev.map(u => u._id === id ? { ...u, ...editFormData } : u));
     } catch (error) {
       toast.error('Update failed');
     }
@@ -113,22 +130,6 @@ const AdminDashboard = () => {
         <div>
           <h1 className="text-5xl font-black text-gray-900 tracking-tight">Control Panel</h1>
           <p className="text-gray-500 font-medium mt-2">Oversee Dhaka's turf ecosystem.</p>
-        </div>
-        <div className="bg-white p-1.5 rounded-2xl shadow-sm border border-gray-100 flex gap-1">
-          {[
-            { id: 'approvals', label: 'Approvals', path: '/dashboard/admin' },
-            { id: 'players', label: 'Players', path: '/dashboard/admin/players' },
-            { id: 'owners', label: 'Owners', path: '/dashboard/admin/owners' },
-            { id: 'stats', label: 'Stats', path: '/dashboard/admin/stats' }
-          ].map(t => (
-            <button 
-              key={t.id}
-              onClick={() => navigate(t.path)}
-              className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${tab === t.id ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-gray-400 hover:bg-gray-50'}`}
-            >
-              {t.label}
-            </button>
-          ))}
         </div>
       </header>
 
@@ -178,7 +179,12 @@ const AdminDashboard = () => {
                   className={`p-10 flex flex-col md:flex-row items-center gap-10 hover:bg-gray-50 transition-colors group cursor-pointer ${selectedTurf?._id === turf._id ? 'bg-gray-50' : ''}`}
                 >
                   <div className="w-40 h-28 rounded-[24px] overflow-hidden shadow-lg flex-shrink-0 group-hover:scale-105 transition-transform">
-                    <img src={turf.images?.[0]} className="w-full h-full object-cover" alt="" />
+                    <img 
+                      src={turf.images?.[0] || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=800'} 
+                      className="w-full h-full object-cover" 
+                      alt="" 
+                      onError={(e) => e.target.src = 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=800'}
+                    />
                   </div>
                   <div className="flex-1 space-y-4">
                     <div className="flex items-center gap-3">
@@ -203,24 +209,44 @@ const AdminDashboard = () => {
 
           <div className="lg:col-span-1">
             {selectedTurf ? (
-              <div className="bg-white rounded-[48px] p-8 shadow-2xl border border-gray-100 sticky top-12 space-y-8 animate-in slide-in-from-right duration-500">
-                <div className="h-64 rounded-[32px] overflow-hidden border-4 border-gray-50 shadow-inner">
+              <div className="bg-white rounded-[48px] p-8 shadow-2xl border border-gray-100 sticky top-12 space-y-8 animate-in slide-in-from-right duration-500 overflow-hidden">
+                <div className="h-64 -mx-8 -mt-8 relative mb-8">
+                  <img 
+                    src={previewImg} 
+                    className="w-full h-full object-cover" 
+                    alt={selectedTurf.name}
+                    onError={() => setPreviewImg('https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=800')}
+                  />
+                  <div className="absolute bottom-4 left-6 flex gap-2">
+                    {selectedTurf.sportTypes?.map(s => (
+                      <span key={s} className="bg-primary/90 backdrop-blur-md text-white px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest">{s}</span>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <h4 className="text-2xl font-black text-gray-900 leading-tight">{selectedTurf.name}</h4>
+                  <div className="flex items-center gap-2 text-gray-500 font-bold text-sm">
+                    <MapPin size={16} className="text-primary" />
+                    <span>{selectedTurf.location?.area || selectedTurf.address}</span>
+                  </div>
+                </div>
+
+                <div className="h-48 rounded-[32px] overflow-hidden border-4 border-gray-50 shadow-inner bg-gray-100">
                   <MapComponent turfs={[selectedTurf]} />
                 </div>
-                <div>
-                  <h4 className="text-xl font-black text-gray-900 mb-2">{selectedTurf.name}</h4>
-                  <p className="text-gray-500 text-sm font-medium leading-relaxed">{selectedTurf.description}</p>
-                </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-gray-50 p-4 rounded-2xl">
-                    <span className="text-[10px] text-gray-400 font-black uppercase block">Price</span>
-                    <span className="font-black text-gray-900">৳{selectedTurf.pricePerHour}/hr</span>
+                    <span className="text-[10px] text-gray-400 font-black uppercase block mb-1">Owner</span>
+                    <span className="font-black text-gray-900 text-sm truncate block">{selectedTurf.owner?.name || 'Unknown'}</span>
                   </div>
                   <div className="bg-gray-50 p-4 rounded-2xl">
-                    <span className="text-[10px] text-gray-400 font-black uppercase block">Type</span>
-                    <span className="font-black text-gray-900">{selectedTurf.isIndoor ? 'Indoor' : 'Outdoor'}</span>
+                    <span className="text-[10px] text-gray-400 font-black uppercase block mb-1">Price</span>
+                    <span className="font-black text-gray-900">৳{selectedTurf.pricePerHour}/hr</span>
                   </div>
                 </div>
+
                 <div className="flex gap-4">
                   <button 
                     onClick={() => handleApproval(selectedTurf._id, 'approved')} 
@@ -237,9 +263,9 @@ const AdminDashboard = () => {
                 </div>
               </div>
             ) : (
-              <div className="bg-gray-50 rounded-[48px] p-12 text-center border-2 border-dashed border-gray-200 h-96 flex flex-col justify-center sticky top-12">
+              <div className="bg-gray-50 rounded-[48px] p-12 text-center border-2 border-dashed border-gray-200 h-[600px] flex flex-col justify-center sticky top-12">
                 <ShieldCheck className="mx-auto text-gray-200 mb-4" size={48} />
-                <p className="text-gray-400 font-black uppercase tracking-widest text-[10px]">Select a request to preview location</p>
+                <p className="text-gray-400 font-black uppercase tracking-widest text-[10px]">Select a request to preview facility</p>
               </div>
             )}
           </div>
@@ -341,7 +367,5 @@ const StatCard = ({ icon: Icon, label, val, color, isPrimary }) => (
     </div>
   </div>
 );
-
-const Briefcase = ({ size, className }) => <svg width={size} height={size} className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><rect width="18" height="14" x="3" y="6" rx="3"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>;
 
 export default AdminDashboard;

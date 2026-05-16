@@ -34,7 +34,7 @@ const Sidebar = ({ role }) => {
   ];
 
   const adminLinks = [
-    { name: 'Approval Queue', path: '/dashboard/admin', icon: ShieldCheck },
+    { name: 'Approval Queue', path: '/dashboard/admin/approvals', icon: ShieldCheck },
     { name: 'All Players', path: '/dashboard/admin/players', icon: Users },
     { name: 'All Owners', path: '/dashboard/admin/owners', icon: Briefcase },
     { name: 'Platform Stats', path: '/dashboard/admin/stats', icon: PieChart },

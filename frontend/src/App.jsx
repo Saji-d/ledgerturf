@@ -47,7 +47,8 @@ function App() {
             <Route path="/dashboard/owner/reservations" element={<OwnerDashboard />} />
             <Route path="/dashboard/owner/analytics" element={<OwnerDashboard />} />
             <Route path="/dashboard/owner/new-listing" element={<OwnerDashboard />} />
-            <Route path="/dashboard/admin" element={<AdminDashboard />} />
+            <Route path="/dashboard/admin" element={<Navigate to="/dashboard/admin/approvals" replace />} />
+            <Route path="/dashboard/admin/approvals" element={<AdminDashboard />} />
             <Route path="/dashboard/admin/players" element={<AdminDashboard />} />
             <Route path="/dashboard/admin/owners" element={<AdminDashboard />} />
             <Route path="/dashboard/admin/stats" element={<AdminDashboard />} />

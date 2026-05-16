@@ -197,20 +197,20 @@ const Home = () => {
               { 
                 icon: <Search className="w-10 h-10 text-primary" />, 
                 title: "Smart Discovery", 
-                desc: "Find turfs using our GeoJSON map search or area-based filters with real photos.",
-                link: "/turfs"
+                desc: "Find the most popular turfs nearby based on your current location and community ratings.",
+                link: "/turfs?sort=nearby"
               },
               { 
                 icon: <Calendar className="w-10 h-10 text-secondary" />, 
                 title: "Live Booking", 
-                desc: "No more phone calls. Select your slot and book instantly with live availability.",
-                link: "/turfs"
+                desc: "Don't wait. See which turfs have open slots right now and secure your game instantly.",
+                link: "/turfs?availableNow=true"
               },
               { 
-                icon: <CheckCircle className="w-10 h-10 text-green-500" />, 
-                title: "Verified Facilities", 
-                desc: "Every turf is vetted by our team to ensure premium grass and amenities.",
-                link: "/turfs"
+                icon: <Clock className="w-10 h-10 text-green-500" />, 
+                title: "Night Booking", 
+                desc: "Looking for a late match? Browse venues with premium floodlights open until midnight.",
+                link: "/turfs?night=true"
               }
             ].map((feature, idx) => (
               <Link to={feature.link} key={idx} className="bg-gray-50 p-12 rounded-[48px] hover:shadow-xl transition-all duration-500 group border border-transparent hover:border-gray-100 flex flex-col">

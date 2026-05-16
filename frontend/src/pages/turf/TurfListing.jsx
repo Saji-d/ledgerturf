@@ -54,6 +54,9 @@ const TurfListing = () => {
 
   const currentSearchValue = searchParams.get('search') || '';
   const currentArea = searchParams.get('area') || '';
+  const availableNow = searchParams.get('availableNow') === 'true';
+  const nightOnly = searchParams.get('night') === 'true';
+  const sortNearby = searchParams.get('sort') === 'nearby';
 
   return (
     <div className="bg-gray-50 min-h-screen pb-20">
@@ -70,15 +73,47 @@ const TurfListing = () => {
                 value={currentSearchValue}
               />
             </div>
-            {currentArea && (
-              <div className="bg-primary/10 border border-primary/20 px-6 py-4 rounded-2xl flex items-center gap-3 animate-in zoom-in-95">
-                <MapPin className="text-primary w-5 h-5" />
-                <span className="font-black text-primary text-sm uppercase tracking-widest">{currentArea}</span>
-                <button onClick={() => updateFilters('area', '')} className="text-primary hover:text-primary-dark p-1">
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            )}
+            
+            {/* Active Filter Chips */}
+            <div className="flex flex-wrap gap-2">
+              {currentArea && (
+                <div className="bg-primary/10 border border-primary/20 px-4 py-2 rounded-xl flex items-center gap-2 animate-in zoom-in-95">
+                  <MapPin className="text-primary w-4 h-4" />
+                  <span className="font-black text-primary text-[10px] uppercase tracking-widest">{currentArea}</span>
+                  <button onClick={() => updateFilters('area', '')} className="text-primary hover:text-primary-dark">
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              )}
+              {availableNow && (
+                <div className="bg-green-50 border border-green-200 px-4 py-2 rounded-xl flex items-center gap-2 animate-in zoom-in-95">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  <span className="font-black text-green-700 text-[10px] uppercase tracking-widest">Available Now</span>
+                  <button onClick={() => updateFilters('availableNow', '')} className="text-green-700 hover:text-green-900">
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              )}
+              {nightOnly && (
+                <div className="bg-purple-50 border border-purple-200 px-4 py-2 rounded-xl flex items-center gap-2 animate-in zoom-in-95">
+                  <Clock className="text-purple-500 w-4 h-4" />
+                  <span className="font-black text-purple-700 text-[10px] uppercase tracking-widest">Night Match</span>
+                  <button onClick={() => updateFilters('night', '')} className="text-purple-700 hover:text-purple-900">
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              )}
+              {sortNearby && (
+                <div className="bg-blue-50 border border-blue-200 px-4 py-2 rounded-xl flex items-center gap-2 animate-in zoom-in-95">
+                  <SlidersHorizontal className="text-blue-500 w-4 h-4" />
+                  <span className="font-black text-blue-700 text-[10px] uppercase tracking-widest">Smart Discovery</span>
+                  <button onClick={() => updateFilters('sort', '')} className="text-blue-700 hover:text-blue-900">
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              )}
+            </div>
+
             <div className="flex gap-2 w-full md:w-auto">
               <button 
                 onClick={() => {
