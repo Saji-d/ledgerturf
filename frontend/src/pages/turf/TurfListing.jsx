@@ -17,12 +17,14 @@ const TurfListing = () => {
     setLoading(true);
     try {
       const params = Object.fromEntries([...searchParams]);
+      console.log('Fetching turfs with params:', params);
       const res = await turfService.getTurfs(params);
+      console.log('API Response:', res);
       if (res.success) {
         setTurfs(res.data);
       }
     } catch (error) {
-      console.error(error);
+      console.error('Error fetching turfs:', error);
     } finally {
       setLoading(false);
     }

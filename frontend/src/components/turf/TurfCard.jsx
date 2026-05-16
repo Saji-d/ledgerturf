@@ -42,15 +42,27 @@ const TurfCard = ({ turf }) => {
 
         <div className="flex items-center justify-between pt-6 border-t border-gray-50">
           <div>
-            <span className="text-[10px] text-gray-400 block mb-1 font-black uppercase tracking-widest">Starting from</span>
-            <span className="text-2xl font-black text-gray-900 tracking-tighter">৳{turf.pricePerHour}<span className="text-sm text-gray-400 font-bold ml-1">/hr</span></span>
+            <span className="text-[10px] text-gray-400 block mb-1 font-black uppercase tracking-widest">Rate / Hour</span>
+            <span className="text-2xl font-black text-gray-900 tracking-tighter">৳{turf.pricePerHour}</span>
           </div>
-          <Link 
-            to={`/turfs/${turf._id}`}
-            className="bg-gray-900 text-white px-6 py-3 rounded-2xl text-sm font-black hover:bg-primary transition shadow-xl shadow-gray-200 active:scale-95"
-          >
-            Details
-          </Link>
+          <div className="flex gap-2">
+            <button 
+              onClick={(e) => {
+                e.preventDefault();
+                window.open(`https://www.google.com/maps/search/?api=1&query=${turf.location.coordinates[1]},${turf.location.coordinates[0]}`, '_blank');
+              }}
+              className="p-3 bg-gray-50 text-gray-400 rounded-2xl hover:bg-primary/10 hover:text-primary transition"
+              title="View on Map"
+            >
+              <MapPin size={20} />
+            </button>
+            <Link 
+              to={`/turfs/${turf._id}`}
+              className="bg-gray-900 text-white px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-primary transition shadow-xl shadow-gray-200 active:scale-95"
+            >
+              Book Now
+            </Link>
+          </div>
         </div>
       </div>
     </div>

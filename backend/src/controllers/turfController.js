@@ -7,7 +7,11 @@ const { TURF_STATUS, BOOKING_STATUS } = require('../utils/constants');
 // @access  Public
 exports.getTurfs = asyncHandler(async (req, res, next) => {
   const reqQuery = { ...req.query };
-  const removeFields = ['select', 'sort', 'page', 'limit', 'lat', 'lng', 'distance', 'date', 'startTime', 'endTime'];
+  const removeFields = [
+    'select', 'sort', 'page', 'limit', 
+    'lat', 'lng', 'distance', 'date', 
+    'startTime', 'endTime', 'search', 'area', 'name'
+  ];
   removeFields.forEach((param) => delete reqQuery[param]);
 
   let queryStr = JSON.stringify(reqQuery);

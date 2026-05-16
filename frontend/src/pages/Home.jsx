@@ -1,16 +1,38 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, MapPin, Calendar, CheckCircle, ArrowRight, ShieldCheck, Briefcase, Star, Clock, Heart } from 'lucide-react';
+import { Search, MapPin, Calendar, CheckCircle, ArrowRight, ShieldCheck, Briefcase, Star, Clock, Heart, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import turfService from '@/services/turfService';
+import TurfCard from '@/components/turf/TurfCard';
 
 const Home = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = React.useState('');
+  const [featuredTurfs, setFeaturedTurfs] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const fetchFeatured = async () => {
+      try {
+        console.log('Fetching featured turfs for homepage...');
+        const res = await turfService.getTurfs({ limit: 3 });
+        console.log('Homepage Featured Turfs API Response:', res);
+        if (res.success) {
+          setFeaturedTurfs(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch featured turfs:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFeatured();
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/turfs?area=${searchQuery}`);
+      navigate(`/turfs?search=${searchQuery}`);
     } else {
       navigate('/turfs');
     }
@@ -18,55 +40,80 @@ const Home = () => {
 
   return (
     <div className="flex flex-col min-h-screen overflow-x-hidden">
-      {/* Hero Section - Fixed height and overflow */}
+      {/* Hero Section */}
       <section className="relative bg-gray-900 h-[calc(100vh-64px)] min-h-[600px] max-h-[900px] flex items-center overflow-hidden">
         <div className="absolute inset-0 z-0 opacity-60">
           <img 
-          src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=2000" 
-          alt="Football turf" 
-          className="w-full h-full object-cover scale-105"
+            src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=2000" 
+            alt="Football turf" 
+            className="w-full h-full object-cover scale-105"
           />
-          </div>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
           <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="max-w-3xl text-white"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="max-w-3xl text-white"
           >
-          <span className="bg-primary/20 backdrop-blur-md text-primary-light px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest mb-8 inline-block border border-primary/30">
-            Dhaka's #1 Turf Network
-          </span>
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-8 leading-tight">
-            Play Hard, <br /><span className="text-primary">Book Easy.</span>
-          </h1>
-          <p className="text-lg md:text-xl text-gray-300 mb-10 leading-relaxed font-medium max-w-xl">
-            Instant booking for Dhaka's top-tier football and cricket turfs. Verified facilities and live availability.
-          </p>
+            <span className="bg-primary/20 backdrop-blur-md text-primary-light px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest mb-8 inline-block border border-primary/30">
+              Dhaka's #1 Turf Network
+            </span>
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-8 leading-tight">
+              Play Hard, <br /><span className="text-primary">Book Easy.</span>
+            </h1>
+            <p className="text-lg md:text-xl text-gray-300 mb-10 leading-relaxed font-medium max-w-xl">
+              Instant booking for Dhaka's top-tier football and cricket turfs. Verified facilities and live availability.
+            </p>
 
-          <form onSubmit={handleSearch} className="mt-8 bg-white p-2 rounded-[32px] shadow-2xl flex flex-col md:flex-row gap-2 max-w-2xl border border-gray-100">
-            <div className="flex-1 flex items-center px-6">
-              <Search className="text-gray-400 w-6 h-6 mr-4" />
-              <input 
-                type="text" 
-                placeholder="Where do you want to play? (e.g. Uttara)" 
-                className="w-full py-4 text-gray-900 font-bold outline-none placeholder:text-gray-400"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <button 
-              type="submit"
-              className="bg-primary text-white px-10 py-4 rounded-[24px] font-black text-lg hover:bg-primary-dark transition shadow-lg shadow-primary/20"
-            >
-              Find Turf
-            </button>
-          </form>
+            <form onSubmit={handleSearch} className="mt-8 bg-white p-2 rounded-[32px] shadow-2xl flex flex-col md:flex-row gap-2 max-w-2xl border border-gray-100">
+              <div className="flex-1 flex items-center px-6">
+                <Search className="text-gray-400 w-6 h-6 mr-4" />
+                <input 
+                  type="text" 
+                  placeholder="Where do you want to play? (e.g. Uttara)" 
+                  className="w-full py-4 text-gray-900 font-bold outline-none placeholder:text-gray-400"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              <button 
+                type="submit"
+                className="bg-primary text-white px-10 py-4 rounded-[24px] font-black text-lg hover:bg-primary-dark transition shadow-lg shadow-primary/20"
+              >
+                Find Turf
+              </button>
+            </form>
           </motion.div>
-          </div>
-          </section>
+        </div>
+      </section>
 
-          {/* Role Selection Section */}
+      {/* Featured Turfs Section */}
+      <section className="py-32 bg-white px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+            <div>
+              <h2 className="text-5xl font-black text-gray-900 tracking-tighter">Featured Venues</h2>
+              <p className="text-gray-500 mt-4 text-xl font-medium">Handpicked premium turfs across Dhaka.</p>
+            </div>
+            <Link to="/turfs" className="bg-gray-50 px-8 py-4 rounded-2xl text-primary font-black flex items-center shadow-sm hover:shadow-md transition group">
+              View All <ArrowRight className="ml-2 group-hover:translate-x-1 transition" />
+            </Link>
+          </div>
+
+          {loading ? (
+            <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary w-12 h-12" /></div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {featuredTurfs.map(turf => (
+                <TurfCard key={turf._id} turf={turf} />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Role Selection Section */}
           <section className="py-24 bg-white relative -mt-16 z-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
