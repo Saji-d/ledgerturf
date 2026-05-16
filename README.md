@@ -1,76 +1,68 @@
 # LedgerTurf - Turf Booking Platform for Dhaka
 
-LedgerTurf is a professional, production-style MERN stack application designed for discovering and booking football and cricket turfs in Dhaka, Bangladesh.
+LedgerTurf is a professional, production-ready fullstack MERN application designed for discovering and booking football and cricket turfs in Dhaka, Bangladesh. Optimized for performance and seamless deployment on Vercel.
 
 ## 🚀 Key Features
 
-- **Advanced Discovery**: Search by area (Uttara, Banani, etc.), sport type, and spatial proximity using GeoJSON.
-- **Robust Booking Engine**: Slot-based management with MongoDB Transaction-safe concurrency protection to prevent double-bookings.
-- **Role-Based Access (RBAC)**:
-  - **Players**: Browse, book, and manage game history.
-  - **Turf Owners**: List facilities, manage images (Cloudinary), and monitor revenue.
-  - **SuperAdmins**: Global oversight with a turf approval/rejection workflow.
-- **Modern UI/UX**: Built with React, Tailwind CSS, and Framer Motion for a premium, mobile-first experience.
-- **Secure Auth**: JWT-based authentication with bcrypt password hashing.
-- **Payment Simulation**: Interactive UI for bKash, Nagad, and Card payment flows.
+- **Smart Discovery**: Search by area (Uttara, Banani, etc.), sport type, and price range.
+- **Dedicated Night Booking**: A focused interface for late-night venues open until 6:00 AM.
+- **Google Maps Integration**:
+  - Precision location picking for owners during registration.
+  - Interactive maps on turf details and admin approval queue.
+  - One-click Google Maps navigation/directions for players.
+- **Robust Booking Engine**: Slot-based management with dynamic time validation (Bangladesh Time UTC+6) and concurrency protection.
+- **Advanced Dashboards**:
+  - **Players**: Manage bookings, track history, and leave facility reviews.
+  - **Turf Owners**: Route-based management hub for listings, reservations, and real-time revenue analytics.
+  - **SuperAdmins**: Centralized control panel for user moderation and venue approvals with live previews.
+- **Modern UI/UX**: Premium dark-themed design built with Framer Motion, featuring password visibility toggles and disabled browser autofill for secure authentication.
 
 ## 🛠 Tech Stack
 
-- **Frontend**: React (Vite), Redux Toolkit, Tailwind CSS, Lucide React, Axios.
-- **Backend**: Node.js, Express.js, JWT, Express-Validator.
-- **Database**: MongoDB Atlas (GeoJSON spatial indexing), Mongoose.
-- **Storage**: Cloudinary (Image uploads).
+- **Frontend**: React (Vite), Redux Toolkit, Tailwind CSS, Lucide React, Framer Motion.
+- **Backend**: Node.js, Express.js (Serverless-ready), JWT, Mongoose.
+- **Database**: MongoDB Atlas (GeoJSON spatial indexing).
+- **Deployment**: Vercel (Fullstack Monorepo configuration).
 
 ## 📦 Project Structure
 
 ```text
-/backend
-  /src
-    /config      # DB & Cloudinary setup
-    /controllers # Logic for Auth, Turfs, Bookings
-    /middleware  # Auth, Validation, Error Handling
-    /models      # Mongoose Schemas (User, Turf, Booking)
-    /routes      # RESTful API endpoints
-    /utils       # AsyncHandler, Constants, Token Utils
-/frontend
-  /src
-    /components  # Atomic UI components
-    /pages       # Feature-driven pages (Turf Details, Dashboards)
-    /services    # Axios API abstractions
-    /store       # Redux Toolkit Slices
+/api             # Vercel Serverless entry point
+/backend         # Express API source code
+  /src/config    # Database configuration
+  /src/models    # Mongoose Schemas
+  /src/routes    # API Endpoints
+/frontend        # React Vite application
+  /src/pages     # Feature-driven UI
+  /src/components # Reusable UI atoms
+vercel.json      # Unified deployment configuration
+package.json     # Root workspace configuration
 ```
 
 ## ⚙️ Local Setup
 
 1. **Clone the repo**
-2. **Backend Setup**:
-   - `cd backend`
-   - `npm install`
-   - Create `.env` from `.env.example`
-   - `npm run dev`
-3. **Frontend Setup**:
-   - `cd frontend`
-   - `npm install`
-   - `npm run dev`
+2. **Install Dependencies**:
+   - `npm install` (Installs both frontend and backend using workspaces)
+3. **Environment Variables**:
+   - Create `.env` in the `backend` folder with:
+     - `MONGO_URI`, `JWT_SECRET`, `NODE_ENV=development`
+   - Create `.env` in the `frontend` folder with:
+     - `VITE_GOOGLE_MAPS_API_KEY`
 4. **Seed Data**:
    - `cd backend`
-   - `node seeder.js`
+   - `node seeder.js` (Populates 25 realistic Dhaka turfs)
+5. **Run Locally**:
+   - Backend: `cd backend && npm run dev`
+   - Frontend: `cd frontend && npm run dev`
 
-## ☁️ Deployment Instructions
+## ☁️ Vercel Deployment
 
-### Backend (Render / Railway)
-1. Connect your GitHub repository.
-2. Set Environment Variables: `MONGODB_URI`, `JWT_SECRET`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`.
-3. Build Command: `npm install`
-4. Start Command: `npm start`
+LedgerTurf is pre-configured for a **zero-config fullstack deployment** on Vercel.
 
-### Frontend (Vercel / Netlify)
-1. Connect your GitHub repository.
-2. Set Environment Variables: `VITE_API_URL` (pointing to your deployed backend).
-3. Build Command: `npm run build`
-4. Output Directory: `dist`
-
-### Database (MongoDB Atlas)
-1. Create a free M0 Cluster.
-2. Allow IP Access (0.0.0.0/0 for production).
-3. Copy connection string to `MONGODB_URI`.
+1. Connect your repository to Vercel.
+2. The `vercel.json` file automatically handles:
+   - Routing all `/api/*` requests to the serverless backend.
+   - Building and serving the React frontend as a Single Page Application (SPA).
+3. Set your Production Environment Variables in the Vercel dashboard:
+   - `MONGO_URI`, `JWT_SECRET`, `NODE_ENV=production`.

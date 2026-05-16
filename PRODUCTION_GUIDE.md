@@ -1,70 +1,47 @@
 # LedgerTurf Production-Style MERN SaaS Overview
 
-LedgerTurf has been upgraded from a prototype to a full-scale, production-ready MERN application. Below is a detailed overview of the system architecture and features.
+LedgerTurf has been architected as a high-control, production-ready MERN application. Below is a detailed overview of the system architecture, advanced features, and deployment workflows.
 
-## 🔑 New Role-Based Authentication System
+## 🔐 Advanced Authentication & Security
 
-The system is now strictly divided into three roles with dedicated dashboards and permissions:
+- **Safe Defaults**: Browser autofill and autocomplete are disabled for sensitive fields (Email, Phone, Password) to prevent credential caching on public terminals.
+- **UX Helpers**: Integrated a "Show Password" visibility toggle in the global `FormInput` component.
+- **RBAC**: Strictly enforced Role-Based Access Control for Players, Turf Owners, and SuperAdmins.
 
-1.  **PLAYER**: Can browse turfs, book slots, and manage their personal booking history.
-    - Dashboard: `/dashboard/player`
-2.  **TURF_OWNER**: Can list multiple turfs, manage availability, and track revenue.
-    - Dashboard: `/dashboard/owner`
-3.  **SUPER_ADMIN**: Global oversight to approve/reject turfs and manage the platform.
-    - Dashboard: `/dashboard/admin`
+## ⚽ Dhaka-Based Ecosystem & Seeder
 
-### Authentication Flow
-- **Registration**: Separate flows for Players (`/register/player`) and Owners (`/register/owner`).
-- **Middleware**: `protect` ensures a valid JWT, while `authorize` guards routes based on roles.
-- **Payload**: JWT now includes `id` and `role` for efficient client-side redirects.
+The system features a realistic dataset of **25 venues** across 10 Dhaka areas (Uttara, Gulshan, Banani, etc.).
+- **High Fidelity**: Every turf includes unique, high-quality sports imagery and precise Dhaka coordinates.
+- **Operating Hours**: Varied schedules including premium **Late Night** facilities open until 6:00 AM.
+- **Seeder Automation**: `node seeder.js` performs a clean wipe and atomic insertion of the entire Dhaka ecosystem.
 
-## ⚽ Turf Management & Approval Workflow
+## 🗺️ Precision Google Maps Integration
 
-Owners can register their business with detailed fields (Opening/Closing times, GeoJSON coordinates, multiple images).
-- **Status Workflow**: New turfs are saved as `pending`.
-- **Visibility**: Only `approved` turfs appear in public search.
-- **Admin Control**: SuperAdmins see a queue of pending requests and can Approve/Reject them with one click.
+- **For Owners**: A draggable pin picker in the registration flow allows precise GeoJSON location marking.
+- **For Players**: Detail pages feature interactive maps and one-click redirection to Google Maps for turn-by-turn directions.
+- **For Admins**: The approval queue includes a map preview to verify the facility's location before authorizing.
 
-## 📅 Slot Booking & Concurrency
+## 📅 Robust Booking & Time Validation
 
-A robust, real-time booking engine prevents double-bookings:
-- **Transaction-Safe**: Uses MongoDB Transactions to check availability and create bookings atomically.
-- **Slot Selection**: Interactive time-slot grid disables already booked times.
-- **Payment Simulation**: Bookings require "payment" via bKash, Nagad, or Card before confirmation.
+- **BD Time Sync**: All slot availability and validations are synchronized with **Bangladesh Time (UTC+6)**, ensuring past slots are automatically disabled.
+- **Visual Validation**: Unavailable slots are styled with high-contrast error states (red backgrounds and not-allowed cursors).
+- **Concurrency**: Backend checks prevent overlapping bookings for the same turf/date/time.
 
-## 🔍 Advanced Search & Map
+## 📈 Dashboard Architecture
 
-- **GeoJSON**: Backend uses `$centerSphere` for spatial discovery.
-- **Filtering**: Search by Area (Uttara, Mirpur, etc.), Sport (Football/Cricket), Price Range, and Facility (Indoor/Outdoor).
-- **UX**: Debounced search and URL search parameter synchronization.
+- **SuperAdmin**: Fully route-based oversight center. Manage approval queues, moderate users, and monitor platform-wide revenue and athlete growth.
+- **Turf Owner**: Dedicated business hub. Track per-venue earnings, manage reservations, and list new facilities with precision maps and imagery.
+- **Unified Navigation**: Centralized sidebar navigation replaces legacy tab switchers for a cleaner, focused UX.
 
-## 🗄️ MongoDB Schema Changes
+## ☁️ Vercel Deployment Workflow
 
-### User Model
-- Added `phone` number (Required).
-- Enforced `role` enums (`user`, `turfOwner`, `superAdmin`).
+LedgerTurf uses a **monorepo-style deployment** on Vercel:
+1.  **Architecture**: The backend Express app is exported as a Vercel Serverless Function via `api/index.js`.
+2.  **Routing**: `vercel.json` rewrites all `/api` calls to the serverless layer and serves the Vite React app as a catch-all for SPA routing.
+3.  **Efficiency**: Connection pooling in `backend/src/config/db.js` ensures efficient MongoDB connection reuse across serverless cold starts.
 
-### Turf Model
-- Added `openingTime` and `closingTime`.
-- Added `status` enum (`pending`, `approved`, `rejected`).
-- Enhanced `location` with GeoJSON Point and Area fields.
-
-## 🚀 Getting Started
-
-### Running Seeders
-To populate the app with 15 realistic Dhaka turfs:
-```bash
-cd backend
-node seeder.js
-```
-
-### Admin Account
-- **Email**: `admin@ledgerturf.com`
-- **Password**: `password123`
-
-### Testing Workflow
-1.  **Register as Owner**: Go to `/register/owner`, fill details, and upload images.
-2.  **Login as Admin**: Go to `/dashboard/admin`, find the new turf, and click **Approve**.
-3.  **Register as Player**: Go to `/register/player`.
-4.  **Book Turf**: Find the approved turf, select a date/slot, and complete the simulated payment.
-5.  **View Dashboard**: Check `/dashboard/player` for your ticket and `/dashboard/owner` for updated revenue.
+### Deployment Quick-Start
+1.  Connect your repo to Vercel.
+2.  Set `MONGO_URI` and `JWT_SECRET`.
+3.  Set `NODE_ENV` to `production`.
+4.  Vercel handles the rest—installing, building, and deploying both layers simultaneously.
