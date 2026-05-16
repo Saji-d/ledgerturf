@@ -4,12 +4,13 @@ import { useSelector } from 'react-redux';
 import turfService from '@/services/turfService';
 import bookingService from '@/services/bookingService';
 import { toast } from 'react-hot-toast';
-import { MapPin, Info, Calendar, Clock, CheckCircle, Loader2, ArrowLeft, Star, Heart, Phone, Mail } from 'lucide-react';
+import { MapPin, Info, Calendar, Clock, CheckCircle, Loader2, ArrowLeft, Star, Heart, Phone, Mail, ArrowRight } from 'lucide-react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import PaymentModal from '@/components/booking/PaymentModal';
 import api from '@/services/api';
 import { formatTime } from '@/utils/formatters';
+import MapComponent from '@/components/turf/MapComponent';
 
 const TurfDetails = () => {
   const { id } = useParams();
@@ -38,12 +39,14 @@ const TurfDetails = () => {
   const fetchDetails = async () => {
     setLoading(true);
     try {
+      console.log('Fetching details for turf ID:', id);
       const res = await turfService.getTurf(id);
+      console.log('Turf details API Response:', res);
       if (res.success) {
         setTurf(res.data);
       }
     } catch (error) {
-      console.error(error);
+      console.error('Error fetching turf details:', error);
       toast.error('Turf not found');
       navigate('/turfs');
     } finally {

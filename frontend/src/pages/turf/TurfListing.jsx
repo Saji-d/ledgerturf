@@ -4,7 +4,8 @@ import turfService from '@/services/turfService';
 import TurfCard from '@/components/turf/TurfCard';
 import Skeleton from '@/components/common/Skeleton';
 import MapComponent from '@/components/turf/MapComponent';
-import { Search, SlidersHorizontal, Map as MapIcon, Loader2, X } from 'lucide-react';
+import { Search, SlidersHorizontal, Map as MapIcon, Loader2, X, MapPin } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 const TurfListing = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -19,12 +20,13 @@ const TurfListing = () => {
       const params = Object.fromEntries([...searchParams]);
       console.log('Fetching turfs with params:', params);
       const res = await turfService.getTurfs(params);
-      console.log('API Response:', res);
+      console.log('API Response data:', res.data);
       if (res.success) {
         setTurfs(res.data);
       }
     } catch (error) {
       console.error('Error fetching turfs:', error);
+      toast.error('Failed to load turfs');
     } finally {
       setLoading(false);
     }
@@ -41,12 +43,16 @@ const TurfListing = () => {
     } else {
       newParams.delete(name);
     }
+    // If searching, clear area to avoid conflicting filters
+    if (name === 'search') newParams.delete('area');
     setSearchParams(newParams);
   };
 
   const clearFilters = () => {
     setSearchParams(new URLSearchParams());
   };
+
+  const currentSearchValue = searchParams.get('search') || searchParams.get('area') || '';
 
   return (
     <div className="bg-gray-50 min-h-screen pb-20">
@@ -60,7 +66,7 @@ const TurfListing = () => {
                 placeholder="Search by area, name, or address..."
                 className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-gray-50 bg-gray-50 focus:ring-2 focus:ring-primary focus:bg-white transition outline-none font-bold"
                 onChange={(e) => updateFilters('search', e.target.value)}
-                value={searchParams.get('search') || ''}
+                value={currentSearchValue}
               />
             </div>
             <div className="flex gap-2 w-full md:w-auto">
