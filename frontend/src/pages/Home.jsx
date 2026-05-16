@@ -210,7 +210,7 @@ const Home = () => {
                 icon: <Clock className="w-10 h-10 text-green-500" />, 
                 title: "Night Booking", 
                 desc: "Looking for a late match? Browse venues with premium floodlights open until midnight.",
-                link: "/turfs?night=true"
+                link: "/turfs/night"
               }
             ].map((feature, idx) => (
               <Link to={feature.link} key={idx} className="bg-gray-50 p-12 rounded-[48px] hover:shadow-xl transition-all duration-500 group border border-transparent hover:border-gray-100 flex flex-col">

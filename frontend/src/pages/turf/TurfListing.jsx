@@ -15,18 +15,25 @@ const TurfListing = () => {
   const [viewMode, setViewMode] = React.useState(searchParams.get('view') === 'map' ? 'map' : 'list');
 
   const fetchTurfs = async () => {
+    console.log('Fetching turfs... current state:', { loading, searchParams: searchParams.toString() });
     setLoading(true);
     try {
-      const params = Object.fromEntries([...searchParams]);
-      console.log('Fetching turfs with params:', params);
+      const params = Object.fromEntries(searchParams.entries());
+      console.log('API Request params:', params);
       const res = await turfService.getTurfs(params);
-      console.log('API Response data:', res.data);
-      if (res.success) {
-        setTurfs(res.data);
+      
+      if (res && res.success) {
+        const data = Array.isArray(res.data) ? res.data : [];
+        console.log(`API Success: fetched ${data.length} turfs`);
+        setTurfs(data);
+      } else {
+        console.warn('API Success but data invalid:', res);
+        setTurfs([]);
       }
     } catch (error) {
-      console.error('Error fetching turfs:', error);
-      toast.error('Failed to load turfs');
+      console.error('API Error details:', error);
+      toast.error('Could not load turfs. Please try again.');
+      setTurfs([]);
     } finally {
       setLoading(false);
     }
@@ -43,7 +50,6 @@ const TurfListing = () => {
     } else {
       newParams.delete(name);
     }
-    // If searching, clear area to avoid conflicting filters
     if (name === 'search') newParams.delete('area');
     setSearchParams(newParams);
   };
@@ -52,15 +58,21 @@ const TurfListing = () => {
     setSearchParams(new URLSearchParams());
   };
 
+  const safeTurfs = Array.isArray(turfs) ? turfs : [];
   const currentSearchValue = searchParams.get('search') || '';
   const currentArea = searchParams.get('area') || '';
   const availableNow = searchParams.get('availableNow') === 'true';
-  const nightOnly = searchParams.get('night') === 'true';
   const sortNearby = searchParams.get('sort') === 'nearby';
 
+  console.log('Rendering TurfListing:', { 
+    viewMode, 
+    turfCount: safeTurfs.length, 
+    loading
+  });
+
   return (
-    <div className="bg-gray-50 min-h-screen pb-20">
-      <div className="bg-white border-b border-gray-100 sticky top-16 z-40">
+    <div className="bg-gray-50 min-h-screen flex flex-col">
+      <div className="bg-white border-b border-gray-100 sticky top-20 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row gap-4 items-center">
             <div className="relative flex-1 w-full">
@@ -90,15 +102,6 @@ const TurfListing = () => {
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                   <span className="font-black text-green-700 text-[10px] uppercase tracking-widest">Available Now</span>
                   <button onClick={() => updateFilters('availableNow', '')} className="text-green-700 hover:text-green-900">
-                    <X className="w-3 h-3" />
-                  </button>
-                </div>
-              )}
-              {nightOnly && (
-                <div className="bg-purple-50 border border-purple-200 px-4 py-2 rounded-xl flex items-center gap-2 animate-in zoom-in-95">
-                  <Clock className="text-purple-500 w-4 h-4" />
-                  <span className="font-black text-purple-700 text-[10px] uppercase tracking-widest">Night Match</span>
-                  <button onClick={() => updateFilters('night', '')} className="text-purple-700 hover:text-purple-900">
                     <X className="w-3 h-3" />
                   </button>
                 </div>
@@ -234,16 +237,16 @@ const TurfListing = () => {
         </div>
       </div>
 
-      <div className="h-full">
+      <div className="flex-1 relative">
         {viewMode === 'map' ? (
-          <div className="h-[calc(100vh-160px)] w-full">
-            <MapComponent turfs={turfs} />
+          <div className="absolute inset-0 w-full h-[calc(100vh-160px)]">
+            <MapComponent turfs={safeTurfs} />
           </div>
         ) : (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-32">
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-2xl font-extrabold text-gray-900">
-                {loading ? 'Searching...' : `${turfs.length} Turfs Found`}
+                {loading ? 'Searching...' : `${safeTurfs.length} Turfs Found`}
               </h2>
             </div>
 
@@ -263,18 +266,20 @@ const TurfListing = () => {
                   </div>
                 ))}
               </div>
-            ) : turfs.length > 0 ? (
+            ) : safeTurfs.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {turfs.map((turf) => (
+                {safeTurfs.map((turf) => (
                   <TurfCard key={turf._id} turf={turf} />
                 ))}
               </div>
             ) : (
-              <div className="bg-white rounded-[40px] p-20 text-center border border-dashed border-gray-200">
-                <Search className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">No turfs found</h3>
-                <p className="text-gray-500 max-w-sm mx-auto">Try adjusting your filters or search area.</p>
-                <button onClick={clearFilters} className="mt-8 bg-gray-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-primary transition">Reset Filters</button>
+              <div className="bg-white rounded-[40px] p-20 text-center border border-dashed border-gray-200 mt-10">
+                <div className="bg-gray-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Search className="w-12 h-12 text-gray-200" />
+                </div>
+                <h3 className="text-3xl font-black text-gray-900 mb-4 tracking-tight">No turfs found</h3>
+                <p className="text-gray-500 max-w-sm mx-auto font-medium text-lg mb-8">We couldn't find any venues matching your current filters. Try widening your search!</p>
+                <button onClick={clearFilters} className="bg-primary text-white px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-sm hover:shadow-2xl transition shadow-xl shadow-primary/20">Clear All Filters</button>
               </div>
             )}
           </div>

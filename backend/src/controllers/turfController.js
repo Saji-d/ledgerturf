@@ -11,18 +11,13 @@ exports.getTurfs = asyncHandler(async (req, res, next) => {
     'select', 'sort', 'page', 'limit', 
     'lat', 'lng', 'distance', 'date', 
     'startTime', 'endTime', 'search', 'area', 'name',
-    'availableNow', 'night'
+    'availableNow'
   ];
   removeFields.forEach((param) => delete reqQuery[param]);
 
   let queryStr = JSON.stringify(reqQuery);
   queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, (match) => `$${match}`);
   let baseQuery = JSON.parse(queryStr);
-
-  // Night Booking Filter (Open late)
-  if (req.query.night === 'true') {
-    baseQuery.closingTime = { $gte: '22:00' };
-  }
 
   // Available Now Filter
   if (req.query.availableNow === 'true') {
@@ -31,7 +26,6 @@ exports.getTurfs = asyncHandler(async (req, res, next) => {
     const bdTime = new Date(now.getTime() + (6 * 60 * 60 * 1000));
     const currentHour = bdTime.getUTCHours();
     const currentHourStr = `${String(currentHour).padStart(2, '0')}:00`;
-    const nextHourStr = `${String(currentHour + 1).padStart(2, '0')}:00`;
     const todayStr = bdTime.toISOString().split('T')[0];
 
     // Find turfs that ARE booked for the current slot

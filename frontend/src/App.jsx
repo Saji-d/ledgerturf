@@ -9,8 +9,9 @@ import Home from '@/pages/Home';
 import Login from '@/pages/auth/Login';
 import RegisterPlayer from '@/pages/auth/RegisterPlayer';
 import RegisterOwner from '@/pages/auth/RegisterOwner';
-import TurfListing from '@/pages/turf/TurfListing';
-import TurfDetails from '@/pages/turf/TurfDetails';
+import TurfListing from './pages/turf/TurfListing';
+import NightTurfs from './pages/turf/NightTurfs';
+import TurfDetails from './pages/turf/TurfDetails';
 import UserDashboard from '@/pages/dashboard/UserDashboard';
 import OwnerDashboard from '@/pages/dashboard/OwnerDashboard';
 import AdminDashboard from '@/pages/dashboard/AdminDashboard';
@@ -34,6 +35,7 @@ function App() {
           <Route path="/register/player" element={<RegisterPlayer />} />
           <Route path="/register/owner" element={<RegisterOwner />} />
           <Route path="/turfs" element={<TurfListing />} />
+          <Route path="/turfs/night" element={<NightTurfs />} />
           <Route path="/turfs/:id" element={<TurfDetails />} />
         </Route>
 
