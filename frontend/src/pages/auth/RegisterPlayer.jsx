@@ -96,6 +96,7 @@ const RegisterPlayer = () => {
             value={email}
             onChange={onChange}
             error={errors.email}
+            autoComplete="off"
             required
           />
 
@@ -107,6 +108,7 @@ const RegisterPlayer = () => {
             value={phone}
             onChange={onChange}
             error={errors.phone}
+            autoComplete="off"
             required
           />
 
@@ -119,6 +121,7 @@ const RegisterPlayer = () => {
             value={password}
             onChange={onChange}
             error={errors.password}
+            autoComplete="new-password"
             required
           />
 

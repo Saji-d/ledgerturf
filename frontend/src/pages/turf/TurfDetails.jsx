@@ -195,7 +195,7 @@ const TurfDetails = () => {
                   </div>
                   <div className="bg-gray-50 p-8 rounded-[40px] border border-gray-100 text-center">
                     <Info className="w-8 h-8 text-secondary mx-auto mb-4" />
-                    <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest block mb-1">Pitch Type</span>
+                    <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest block mb-1">Turf Type</span>
                     <span className="text-lg font-black text-gray-900">{turf.isIndoor ? 'Indoor' : 'Outdoor'}</span>
                   </div>
                 </div>
@@ -203,6 +203,24 @@ const TurfDetails = () => {
                 <div className="space-y-6">
                   <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter">About the facility</h3>
                   <p className="text-gray-500 text-lg leading-relaxed font-medium">{turf.description}</p>
+                </div>
+
+                {/* Location Map */}
+                <div className="space-y-6 pt-12 border-t border-gray-50">
+                  <div className="flex justify-between items-end">
+                    <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter">Location & Directions</h3>
+                    <a 
+                      href={`https://www.google.com/maps/dir/?api=1&destination=${turf.location?.coordinates?.[1]},${turf.location?.coordinates?.[0]}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary font-black text-sm hover:underline flex items-center gap-2"
+                    >
+                      Get Directions <ArrowRight size={16} />
+                    </a>
+                  </div>
+                  <div className="h-96 rounded-[48px] overflow-hidden border-4 border-gray-50 shadow-inner bg-gray-100">
+                    <MapComponent turfs={[turf]} />
+                  </div>
                 </div>
 
                 {/* Owner Info for Admins/Players */}
@@ -218,7 +236,7 @@ const TurfDetails = () => {
                     <div className="bg-secondary/10 p-4 rounded-2xl"><Mail className="text-secondary" /></div>
                     <div>
                       <span className="text-[10px] text-gray-400 font-black uppercase block">Support Email</span>
-                      <span className="font-black text-gray-900">{turf.owner?.email || 'support@pitch.com'}</span>
+                      <span className="font-black text-gray-900">{turf.owner?.email || 'support@ledgerturf.com'}</span>
                     </div>
                   </div>
                 </div>

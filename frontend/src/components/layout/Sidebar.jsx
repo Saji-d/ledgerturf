@@ -10,7 +10,8 @@ import {
   PlusCircle, 
   Users, 
   ShieldCheck, 
-  PieChart
+  PieChart,
+  Briefcase
 } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { logout, reset } from '@/store/authSlice';

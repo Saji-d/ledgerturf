@@ -4,7 +4,7 @@ import bookingService from '@/services/bookingService';
 import { useSelector } from 'react-redux';
 import { 
   LayoutGrid, Plus, Clock, Users, DollarSign, Loader2, 
-  CheckCircle, XCircle, AlertCircle, Edit, Trash2, Camera
+  CheckCircle, XCircle, AlertCircle, Edit, Trash2, Camera, MapPin, Calendar
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { formatTime } from '@/utils/formatters';

@@ -156,10 +156,10 @@ const RegisterOwner = () => {
                 <h3 className="text-xl font-black text-gray-900 uppercase tracking-wider">Owner Profile</h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <FormInput label="Full Name" name="name" icon={UserIcon} placeholder="John Doe" value={formData.name} onChange={onChange} error={errors.name} required />
-                <FormInput label="Email Address" name="email" type="email" icon={Mail} placeholder="john@example.com" value={formData.email} onChange={onChange} error={errors.email} required />
-                <FormInput label="Phone Number" name="phone" icon={Phone} placeholder="01XXXXXXXXX" value={formData.phone} onChange={onChange} error={errors.phone} required />
-                <FormInput label="Account Password" name="password" type="password" icon={Lock} placeholder="Min. 6 chars" value={formData.password} onChange={onChange} error={errors.password} required />
+                <FormInput label="Full Name" name="name" icon={UserIcon} placeholder="John Doe" value={formData.name} onChange={onChange} error={errors.name} autoComplete="off" required />
+                <FormInput label="Email Address" name="email" type="email" icon={Mail} placeholder="john@example.com" value={formData.email} onChange={onChange} error={errors.email} autoComplete="off" required />
+                <FormInput label="Phone Number" name="phone" icon={Phone} placeholder="01XXXXXXXXX" value={formData.phone} onChange={onChange} error={errors.phone} autoComplete="off" required />
+                <FormInput label="Account Password" name="password" type="password" icon={Lock} placeholder="Min. 6 chars" value={formData.password} onChange={onChange} error={errors.password} autoComplete="new-password" required />
               </div>
             </section>
 

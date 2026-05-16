@@ -1,6 +1,7 @@
 import React from 'react';
 import turfService from '@/services/turfService';
 import api from '@/services/api';
+import MapComponent from '@/components/turf/MapComponent';
 import { 
   ShieldCheck, CheckCircle, XCircle, Clock, MapPin, Loader2, 
   User as UserIcon, Users, CreditCard, Activity, Trash2, Edit 
@@ -15,6 +16,7 @@ const AdminDashboard = () => {
     totalPlayers: 0, totalOwners: 0, totalBookings: 0, totalRevenue: 0
   });
   const [loading, setLoading] = React.useState(true);
+  const [selectedTurf, setSelectedTurf] = React.useState(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -43,6 +45,7 @@ const AdminDashboard = () => {
     try {
       await turfService.approveTurf(id, status);
       toast.success(`Turf ${status} successfully`);
+      setSelectedTurf(null);
       fetchData();
     } catch (error) {
       toast.error('Action failed');
@@ -92,39 +95,82 @@ const AdminDashboard = () => {
       )}
 
       {tab === 'approvals' && (
-        <div className="bg-white rounded-[48px] shadow-2xl border border-gray-100 overflow-hidden">
-          <div className="p-10 border-b border-gray-50 bg-gray-50/50 flex justify-between items-center">
-            <h2 className="text-2xl font-black text-gray-900">Pending Requests</h2>
-            <span className="bg-primary text-white px-4 py-1 rounded-full text-xs font-black">{pendingTurfs.length} New</span>
-          </div>
-          <div className="divide-y divide-gray-50">
-            {pendingTurfs.length > 0 ? pendingTurfs.map(turf => (
-              <div key={turf._id} className="p-10 flex flex-col md:flex-row items-center gap-10 hover:bg-gray-50 transition-colors group">
-                <div className="w-64 h-40 rounded-[32px] overflow-hidden shadow-lg flex-shrink-0 group-hover:scale-105 transition-transform">
-                  <img src={turf.images?.[0]} className="w-full h-full object-cover" alt="" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <div className="lg:col-span-2 bg-white rounded-[48px] shadow-2xl border border-gray-100 overflow-hidden">
+            <div className="p-10 border-b border-gray-50 bg-gray-50/50 flex justify-between items-center">
+              <h2 className="text-2xl font-black text-gray-900">Pending Requests</h2>
+              <span className="bg-primary text-white px-4 py-1 rounded-full text-xs font-black">{pendingTurfs.length} New</span>
+            </div>
+            <div className="divide-y divide-gray-50">
+              {pendingTurfs.length > 0 ? pendingTurfs.map(turf => (
+                <div 
+                  key={turf._id} 
+                  onClick={() => setSelectedTurf(turf)}
+                  className={`p-10 flex flex-col md:flex-row items-center gap-10 hover:bg-gray-50 transition-colors group cursor-pointer ${selectedTurf?._id === turf._id ? 'bg-gray-50' : ''}`}
+                >
+                  <div className="w-40 h-28 rounded-[24px] overflow-hidden shadow-lg flex-shrink-0 group-hover:scale-105 transition-transform">
+                    <img src={turf.images?.[0]} className="w-full h-full object-cover" alt="" />
+                  </div>
+                  <div className="flex-1 space-y-4">
+                    <div className="flex items-center gap-3">
+                      <h3 className="text-2xl font-black text-gray-900 leading-tight">{turf.name}</h3>
+                      <span className="bg-yellow-100 text-yellow-600 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Pending</span>
+                    </div>
+                    <div className="flex flex-wrap gap-4 text-gray-500 font-bold text-xs">
+                      <span className="flex items-center gap-2"><MapPin size={14} className="text-primary" /> {turf.address}</span>
+                      <span className="flex items-center gap-2"><UserIcon size={14} className="text-primary" /> {turf.owner?.name || 'New Owner'}</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex-1 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <h3 className="text-3xl font-black text-gray-900 leading-tight">{turf.name}</h3>
-                    <span className="bg-yellow-100 text-yellow-600 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Pending</span>
-                  </div>
-                  <div className="flex flex-wrap gap-6 text-gray-500 font-bold text-sm">
-                    <span className="flex items-center gap-2"><MapPin size={16} className="text-primary" /> {turf.address}</span>
-                    <span className="flex items-center gap-2"><UserIcon size={16} className="text-primary" /> {turf.owner?.name || 'New Owner'}</span>
-                    <span className="flex items-center gap-2 font-black text-gray-900"><CreditCard size={16} className="text-primary" /> ৳{turf.pricePerHour}/hr</span>
-                  </div>
+              )) : (
+                <div className="p-24 text-center">
+                  <CheckCircle className="mx-auto text-green-200 mb-6" size={64} />
+                  <h3 className="text-2xl font-black text-gray-900">Queue Clear!</h3>
+                  <p className="text-gray-400 font-medium">All turfs have been reviewed.</p>
+                </div>
+              )}
+            </div>
+          </div>
 
+          <div className="lg:col-span-1">
+            {selectedTurf ? (
+              <div className="bg-white rounded-[48px] p-8 shadow-2xl border border-gray-100 sticky top-12 space-y-8 animate-in slide-in-from-right duration-500">
+                <div className="h-64 rounded-[32px] overflow-hidden border-4 border-gray-50 shadow-inner">
+                  <MapComponent turfs={[selectedTurf]} />
+                </div>
+                <div>
+                  <h4 className="text-xl font-black text-gray-900 mb-2">{selectedTurf.name}</h4>
+                  <p className="text-gray-500 text-sm font-medium leading-relaxed">{selectedTurf.description}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-gray-50 p-4 rounded-2xl">
+                    <span className="text-[10px] text-gray-400 font-black uppercase block">Price</span>
+                    <span className="font-black text-gray-900">৳{selectedTurf.pricePerHour}/hr</span>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-2xl">
+                    <span className="text-[10px] text-gray-400 font-black uppercase block">Type</span>
+                    <span className="font-black text-gray-900">{selectedTurf.isIndoor ? 'Indoor' : 'Outdoor'}</span>
+                  </div>
                 </div>
                 <div className="flex gap-4">
-                  <button onClick={() => handleApproval(turf._id, 'approved')} className="bg-green-500 text-white p-5 rounded-3xl hover:bg-green-600 transition shadow-xl shadow-green-100"><CheckCircle size={24} /></button>
-                  <button onClick={() => handleApproval(turf._id, 'rejected')} className="bg-red-50 text-red-500 p-5 rounded-3xl hover:bg-red-100 transition"><XCircle size={24} /></button>
+                  <button 
+                    onClick={() => handleApproval(selectedTurf._id, 'approved')} 
+                    className="flex-1 bg-green-500 text-white py-4 rounded-2xl font-black hover:bg-green-600 transition shadow-xl shadow-green-100 flex items-center justify-center gap-2"
+                  >
+                    <CheckCircle size={20} /> Approve
+                  </button>
+                  <button 
+                    onClick={() => handleApproval(selectedTurf._id, 'rejected')} 
+                    className="flex-1 bg-red-50 text-red-500 py-4 rounded-2xl font-black hover:bg-red-100 transition flex items-center justify-center gap-2"
+                  >
+                    <XCircle size={20} /> Reject
+                  </button>
                 </div>
               </div>
-            )) : (
-              <div className="p-24 text-center">
-                <CheckCircle className="mx-auto text-green-200 mb-6" size={64} />
-                <h3 className="text-2xl font-black text-gray-900">Queue Clear!</h3>
-                <p className="text-gray-400 font-medium">All turfs have been reviewed.</p>
+            ) : (
+              <div className="bg-gray-50 rounded-[48px] p-12 text-center border-2 border-dashed border-gray-200 h-96 flex flex-col justify-center sticky top-12">
+                <ShieldCheck className="mx-auto text-gray-200 mb-4" size={48} />
+                <p className="text-gray-400 font-black uppercase tracking-widest text-[10px]">Select a request to preview location</p>
               </div>
             )}
           </div>

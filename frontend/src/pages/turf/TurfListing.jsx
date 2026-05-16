@@ -63,8 +63,29 @@ const TurfListing = () => {
             </div>
             <div className="flex gap-2 w-full md:w-auto">
               <button 
+                onClick={() => {
+                  if (navigator.geolocation) {
+                    toast.loading('Getting your location...');
+                    navigator.geolocation.getCurrentPosition((pos) => {
+                      toast.dismiss();
+                      updateFilters('lat', pos.coords.latitude);
+                      updateFilters('lng', pos.coords.longitude);
+                      updateFilters('distance', 10);
+                      toast.success('Showing turfs within 10km');
+                    }, (err) => {
+                      toast.dismiss();
+                      toast.error('Location access denied');
+                    });
+                  }
+                }}
+                className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-4 bg-white border border-gray-100 rounded-2xl font-black text-xs uppercase tracking-widest text-gray-700 hover:bg-gray-50 transition"
+              >
+                <MapPin className="w-5 h-5 text-primary" />
+                Nearby
+              </button>
+              <button 
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-4 bg-white border border-gray-100 rounded-2xl font-bold text-gray-700 hover:bg-gray-50 transition"
+                className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-4 bg-white border border-gray-100 rounded-2xl font-black text-xs uppercase tracking-widest text-gray-700 hover:bg-gray-50 transition"
               >
                 <SlidersHorizontal className="w-5 h-5" />
                 Filters
@@ -79,11 +100,11 @@ const TurfListing = () => {
           </div>
 
           {showFilters && (
-            <div className="mt-6 pt-6 border-t border-gray-50 grid grid-cols-2 md:grid-cols-4 gap-6 animate-in slide-in-from-top duration-300">
+            <div className="mt-6 pt-6 border-t border-gray-50 grid grid-cols-2 md:grid-cols-5 gap-6 animate-in slide-in-from-top duration-300">
               <div>
-                <label className="block text-sm font-bold text-gray-900 mb-2">Sport Type</label>
+                <label className="block text-sm font-black text-gray-900 mb-2 uppercase tracking-widest text-[10px]">Sport Type</label>
                 <select 
-                  className="w-full p-3 bg-gray-50 border border-transparent rounded-xl focus:ring-2 focus:ring-primary transition"
+                  className="w-full p-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:ring-2 focus:ring-primary focus:bg-white transition font-bold outline-none"
                   onChange={(e) => updateFilters('sportTypes', e.target.value)}
                   value={searchParams.get('sportTypes') || ''}
                 >
@@ -93,51 +114,66 @@ const TurfListing = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-900 mb-2">Facility</label>
-                <select 
-                  className="w-full p-3 bg-gray-50 border border-transparent rounded-xl focus:ring-2 focus:ring-primary transition"
-                  onChange={(e) => updateFilters('isIndoor', e.target.value)}
-                  value={searchParams.get('isIndoor') || ''}
-                >
-                  <option value="">Any</option>
-                  <option value="true">Indoor</option>
-                  <option value="false">Outdoor</option>
-                </select>
+                <label className="block text-sm font-black text-gray-900 mb-2 uppercase tracking-widest text-[10px]">Price Range (৳)</label>
+                <div className="flex gap-2">
+                  <input 
+                    type="number" 
+                    placeholder="Min"
+                    className="w-1/2 p-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:ring-2 focus:ring-primary focus:bg-white transition font-bold outline-none"
+                    onChange={(e) => updateFilters('pricePerHour[gte]', e.target.value)}
+                    value={searchParams.get('pricePerHour[gte]') || ''}
+                  />
+                  <input 
+                    type="number" 
+                    placeholder="Max"
+                    className="w-1/2 p-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:ring-2 focus:ring-primary focus:bg-white transition font-bold outline-none"
+                    onChange={(e) => updateFilters('pricePerHour[lte]', e.target.value)}
+                    value={searchParams.get('pricePerHour[lte]') || ''}
+                  />
+                </div>
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-900 mb-2">Date</label>
+                <label className="block text-sm font-black text-gray-900 mb-2 uppercase tracking-widest text-[10px]">Availability Date</label>
                 <input 
                   type="date" 
-                  className="w-full p-3 bg-gray-50 border border-transparent rounded-xl focus:ring-2 focus:ring-primary transition"
+                  min={new Date().toISOString().split('T')[0]}
+                  className="w-full p-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:ring-2 focus:ring-primary focus:bg-white transition font-bold outline-none"
                   onChange={(e) => updateFilters('date', e.target.value)}
                   value={searchParams.get('date') || ''}
                 />
               </div>
-              <div className="flex gap-2 items-end">
-                <div className="flex-1">
-                  <label className="block text-sm font-bold text-gray-900 mb-2">Time</label>
-                  <select 
-                    className="w-full p-3 bg-gray-50 border-2 border-gray-50 rounded-xl focus:ring-2 focus:ring-primary focus:bg-white transition font-bold outline-none"
-                    onChange={(e) => {
-                      updateFilters('startTime', e.target.value);
+              <div>
+                <label className="block text-sm font-black text-gray-900 mb-2 uppercase tracking-widest text-[10px]">Start Time</label>
+                <select 
+                  className="w-full p-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:ring-2 focus:ring-primary focus:bg-white transition font-bold outline-none"
+                  onChange={(e) => {
+                    updateFilters('startTime', e.target.value);
+                    if (e.target.value) {
                       const [h, m] = e.target.value.split(':').map(Number);
                       updateFilters('endTime', `${String(h + 1).padStart(2, '0')}:00`);
-                    }}
-                    value={searchParams.get('startTime') || ''}
-                  >
-                    <option value="">Any Time</option>
-                    {[
-                      { v: "06:00", l: "06:00 AM" }, { v: "07:00", l: "07:00 AM" }, { v: "08:00", l: "08:00 AM" },
-                      { v: "09:00", l: "09:00 AM" }, { v: "10:00", l: "10:00 AM" }, { v: "11:00", l: "11:00 AM" },
-                      { v: "12:00", l: "12:00 PM" }, { v: "13:00", l: "01:00 PM" }, { v: "14:00", l: "02:00 PM" },
-                      { v: "15:00", l: "03:00 PM" }, { v: "16:00", l: "04:00 PM" }, { v: "17:00", l: "05:00 PM" },
-                      { v: "18:00", l: "06:00 PM" }, { v: "19:00", l: "07:00 PM" }, { v: "20:00", l: "08:00 PM" },
-                      { v: "21:00", l: "09:00 PM" }, { v: "22:00", l: "10:00 PM" }
-                    ].map(t => <option key={t.v} value={t.v}>{t.l}</option>)}
-                  </select>
-                </div>
-                <button onClick={clearFilters} className="text-sm font-bold text-red-500 hover:underline flex items-center mb-3">
-                  <X className="w-4 h-4 mr-1" /> Clear
+                    } else {
+                      updateFilters('endTime', '');
+                    }
+                  }}
+                  value={searchParams.get('startTime') || ''}
+                >
+                  <option value="">Any Time</option>
+                  {[
+                    { v: "06:00", l: "06:00 AM" }, { v: "07:00", l: "07:00 AM" }, { v: "08:00", l: "08:00 AM" },
+                    { v: "09:00", l: "09:00 AM" }, { v: "10:00", l: "10:00 AM" }, { v: "11:00", l: "11:00 AM" },
+                    { v: "12:00", l: "12:00 PM" }, { v: "13:00", l: "01:00 PM" }, { v: "14:00", l: "02:00 PM" },
+                    { v: "15:00", l: "03:00 PM" }, { v: "16:00", l: "04:00 PM" }, { v: "17:00", l: "05:00 PM" },
+                    { v: "18:00", l: "06:00 PM" }, { v: "19:00", l: "07:00 PM" }, { v: "20:00", l: "08:00 PM" },
+                    { v: "21:00", l: "09:00 PM" }, { v: "22:00", l: "10:00 PM" }
+                  ].map(t => <option key={t.v} value={t.v}>{t.l}</option>)}
+                </select>
+              </div>
+              <div className="flex flex-col justify-end">
+                <button 
+                  onClick={clearFilters} 
+                  className="w-full py-4 bg-red-50 text-red-500 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-100 transition flex items-center justify-center gap-2"
+                >
+                  <X className="w-4 h-4" /> Reset All
                 </button>
               </div>
             </div>

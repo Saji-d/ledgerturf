@@ -1,9 +1,10 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import bookingService from '@/services/bookingService';
 import { useSelector } from 'react-redux';
 import { 
   Calendar, Clock, MapPin, Tag, Trash2, Loader2, 
-  AlertCircle, ChevronRight, Map as MapIcon, Phone, DollarSign, Star
+  AlertCircle, ChevronRight, Map as MapIcon, Phone, DollarSign, Star, Mail
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { formatTime } from '@/utils/formatters';

@@ -28,7 +28,7 @@ const Navbar = () => {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-10">
-            <Link to="/turfs" className="text-gray-500 hover:text-primary transition font-bold text-sm uppercase tracking-widest">Find Pitches</Link>
+            <Link to="/turfs" className="text-gray-500 hover:text-primary transition font-bold text-sm uppercase tracking-widest">Find Turfs</Link>
             {user ? (
               <div className="flex items-center space-x-6">
                 <Link 
@@ -70,7 +70,7 @@ const Navbar = () => {
       {isOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 animate-in slide-in-from-top duration-300">
           <div className="px-6 pt-4 pb-10 space-y-4">
-            <Link to="/turfs" onClick={() => setIsOpen(false)} className="block py-4 text-gray-900 font-black text-xl border-b border-gray-50">Find Pitches</Link>
+            <Link to="/turfs" onClick={() => setIsOpen(false)} className="block py-4 text-gray-900 font-black text-xl border-b border-gray-50">Find Turfs</Link>
             {user ? (
               <>
                 <Link to="/dashboard" onClick={() => setIsOpen(false)} className="block py-4 text-primary font-black text-xl border-b border-gray-50">Dashboard</Link>
