@@ -27,9 +27,10 @@ const Sidebar = ({ role }) => {
   ];
 
   const ownerLinks = [
-    { name: 'My Turfs', path: '/dashboard/owner', icon: LayoutDashboard },
-    { name: 'Reservations', path: '/dashboard/owner/bookings', icon: Calendar },
-    { name: 'Revenue', path: '/dashboard/owner/analytics', icon: PieChart },
+    { name: 'My Turfs', path: '/dashboard/owner/turfs', icon: LayoutDashboard },
+    { name: 'Reservations', path: '/dashboard/owner/reservations', icon: Calendar },
+    { name: 'Analytics', path: '/dashboard/owner/analytics', icon: PieChart },
+    { name: 'New Listing', path: '/dashboard/owner/new-listing', icon: PlusCircle },
   ];
 
   const adminLinks = [

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import turfService from '@/services/turfService';
 import bookingService from '@/services/bookingService';
 import { useSelector } from 'react-redux';
@@ -13,11 +14,22 @@ import MapPicker from '@/components/common/MapPicker';
 
 const OwnerDashboard = () => {
   const { user } = useSelector((state) => state.auth);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Sync state with URL
+  const getTabFromPath = (path) => {
+    if (path.includes('/reservations')) return 'bookings';
+    if (path.includes('/analytics')) return 'analytics';
+    if (path.includes('/new-listing')) return 'new-listing';
+    return 'turfs';
+  };
+
+  const tab = getTabFromPath(location.pathname);
+
   const [turfs, setTurfs] = React.useState([]);
   const [bookings, setBookings] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
-  const [tab, setTab] = React.useState('turfs'); // 'turfs', 'bookings', 'analytics'
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
   
   // New Listing Form State
   const [formData, setFormData] = React.useState({
@@ -76,7 +88,7 @@ const OwnerDashboard = () => {
       const res = await turfService.createTurf(formData);
       if (res.success) {
         toast.success('Turf listing created! Pending admin approval.');
-        setIsModalOpen(false);
+        navigate('/dashboard/owner/turfs');
         fetchData();
         setFormData({
           name: '', description: '', address: '', area: 'Uttara',
@@ -109,17 +121,6 @@ const OwnerDashboard = () => {
         <div>
           <h1 className="text-5xl font-black text-gray-900 tracking-tight">Business Hub</h1>
           <p className="text-gray-500 font-medium mt-2">Manage your facilities and track growth.</p>
-        </div>
-        <div className="bg-white p-1.5 rounded-2xl shadow-sm border border-gray-100 flex gap-1">
-          {['turfs', 'bookings', 'analytics'].map(t => (
-            <button 
-              key={t}
-              onClick={() => setTab(t)}
-              className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${tab === t ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-gray-400 hover:bg-gray-50'}`}
-            >
-              {t}
-            </button>
-          ))}
         </div>
       </header>
 
@@ -157,12 +158,6 @@ const OwnerDashboard = () => {
         <div className="space-y-8">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-black text-gray-900">Your Facilities</h2>
-            <button 
-              onClick={() => setIsModalOpen(true)}
-              className="bg-gray-900 text-white px-6 py-3 rounded-2xl font-black text-sm hover:bg-primary transition shadow-xl shadow-gray-100 flex items-center gap-2"
-            >
-              <Plus size={18} /> New Listing
-            </button>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -244,118 +239,112 @@ const OwnerDashboard = () => {
         </div>
       )}
 
-      {/* New Listing Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[64px] shadow-2xl border border-gray-100 animate-in zoom-in-95 duration-300">
-            <div className="p-12">
-              <div className="flex justify-between items-center mb-10">
-                <div>
-                  <h2 className="text-4xl font-black text-gray-900 tracking-tight">New Turf Listing</h2>
-                  <p className="text-gray-500 font-medium mt-2">Register your facility on LedgerTurf.</p>
-                </div>
-                <button onClick={() => setIsModalOpen(false)} className="p-4 bg-gray-50 rounded-3xl hover:bg-gray-100 transition"><X size={24} /></button>
+      {tab === 'new-listing' && (
+        <div className="bg-white rounded-[64px] shadow-2xl border border-gray-100 animate-in slide-in-from-bottom-4 duration-500">
+          <div className="p-12">
+            <div className="flex justify-between items-center mb-10">
+              <div>
+                <h2 className="text-4xl font-black text-gray-900 tracking-tight">New Turf Listing</h2>
+                <p className="text-gray-500 font-medium mt-2">Register your facility on LedgerTurf.</p>
               </div>
+              <button onClick={() => navigate('/dashboard/owner/turfs')} className="p-4 bg-gray-50 rounded-3xl hover:bg-gray-100 transition"><X size={24} /></button>
+            </div>
 
-              <form onSubmit={handleCreateTurf} className="space-y-12">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                  <div className="space-y-8">
+            <form onSubmit={handleCreateTurf} className="space-y-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div className="space-y-8">
+                  <FormInput 
+                    label="Business Name" 
+                    placeholder="e.g. Uttara Arena FC" 
+                    value={formData.name} 
+                    onChange={(e) => setFormData({...formData, name: e.target.value})} 
+                    required 
+                  />
+                  <div className="space-y-2">
+                    <label className="block text-sm font-black text-gray-700 uppercase tracking-widest">Description</label>
+                    <textarea 
+                      className="w-full p-6 rounded-3xl bg-gray-50 border-2 border-transparent focus:bg-white focus:border-primary outline-none transition font-medium h-32 resize-none"
+                      placeholder="Tell players about your facility..."
+                      value={formData.description}
+                      onChange={(e) => setFormData({...formData, description: e.target.value})}
+                      required
+                    ></textarea>
+                  </div>
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="block text-sm font-black text-gray-700 uppercase tracking-widest">Area</label>
+                      <select 
+                        className="w-full p-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:bg-white focus:border-primary outline-none transition font-bold"
+                        value={formData.area}
+                        onChange={(e) => setFormData({...formData, area: e.target.value})}
+                      >
+                        {['Uttara', 'Mirpur', 'Banani', 'Gulshan', 'Dhanmondi', 'Bashundhara', 'Badda', 'Khilkhet', 'Mohammadpur', 'Rampura'].map(a => <option key={a} value={a}>{a}</option>)}
+                      </select>
+                    </div>
                     <FormInput 
-                      label="Business Name" 
-                      placeholder="e.g. Uttara Arena FC" 
-                      value={formData.name} 
-                      onChange={(e) => setFormData({...formData, name: e.target.value})} 
+                      label="Rate (৳/hr)" 
+                      type="number" 
+                      placeholder="3500" 
+                      value={formData.pricePerHour} 
+                      onChange={(e) => setFormData({...formData, pricePerHour: e.target.value})} 
                       required 
                     />
-                    <div className="space-y-2">
-                      <label className="block text-sm font-black text-gray-700 uppercase tracking-widest">Description</label>
-                      <textarea 
-                        className="w-full p-6 rounded-3xl bg-gray-50 border-2 border-transparent focus:bg-white focus:border-primary outline-none transition font-medium h-32 resize-none"
-                        placeholder="Tell players about your facility..."
-                        value={formData.description}
-                        onChange={(e) => setFormData({...formData, description: e.target.value})}
-                        required
-                      ></textarea>
-                    </div>
-                    <div className="grid grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <label className="block text-sm font-black text-gray-700 uppercase tracking-widest">Area</label>
-                        <select 
-                          className="w-full p-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:bg-white focus:border-primary outline-none transition font-bold"
-                          value={formData.area}
-                          onChange={(e) => setFormData({...formData, area: e.target.value})}
-                        >
-                          {['Uttara', 'Mirpur', 'Banani', 'Gulshan', 'Dhanmondi', 'Bashundhara', 'Badda', 'Khilkhet', 'Mohammadpur', 'Rampura'].map(a => <option key={a} value={a}>{a}</option>)}
-                        </select>
-                      </div>
-                      <FormInput 
-                        label="Rate (৳/hr)" 
-                        type="number" 
-                        placeholder="3500" 
-                        value={formData.pricePerHour} 
-                        onChange={(e) => setFormData({...formData, pricePerHour: e.target.value})} 
-                        required 
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-6">
-                       <FormInput 
-                        label="Opening Time" 
-                        type="time" 
-                        value={formData.openingTime} 
-                        onChange={(e) => setFormData({...formData, openingTime: e.target.value})} 
-                      />
-                       <FormInput 
-                        label="Closing Time" 
-                        type="time" 
-                        value={formData.closingTime} 
-                        onChange={(e) => setFormData({...formData, closingTime: e.target.value})} 
-                      />
-                    </div>
                   </div>
+                  <div className="grid grid-cols-2 gap-6">
+                     <FormInput 
+                      label="Opening Time" 
+                      type="time" 
+                      value={formData.openingTime} 
+                      onChange={(e) => setFormData({...formData, openingTime: e.target.value})} 
+                    />
+                     <FormInput 
+                      label="Closing Time" 
+                      type="time" 
+                      value={formData.closingTime} 
+                      onChange={(e) => setFormData({...formData, closingTime: e.target.value})} 
+                    />
+                  </div>
+                </div>
 
-                  <div className="space-y-8">
-                    <FormInput 
-                      label="Detailed Address" 
+                <div className="space-y-8">
+                  <div className="space-y-4">
+                    <label className="block text-sm font-black text-gray-700 uppercase tracking-widest">Detailed Address</label>
+                    <textarea 
+                      className="w-full p-6 rounded-3xl bg-gray-50 border-2 border-transparent focus:bg-white focus:border-primary outline-none transition font-medium h-24 resize-none"
                       placeholder="e.g. Sector 4, Road 11..." 
                       value={formData.address} 
                       onChange={(e) => setFormData({...formData, address: e.target.value})} 
                       required 
-                    />
-                    <div className="space-y-4">
-                      <label className="block text-sm font-black text-gray-700 uppercase tracking-widest">Pin exact location on map</label>
-                      <div className="rounded-[32px] overflow-hidden border-4 border-gray-50">
-                        <MapPicker 
-                          onLocationSelect={(coords) => setFormData({...formData, coordinates: [coords.lng, coords.lat]})} 
-                          initialLocation={{lat: 23.8103, lng: 90.4125}}
-                        />
-                      </div>
-                    </div>
-                    <FormInput 
-                      label="Image URL" 
-                      placeholder="https://images.unsplash.com/..." 
-                      value={formData.images[0]} 
-                      onChange={(e) => setFormData({...formData, images: [e.target.value]})} 
-                      required 
-                    />
-                    <FormInput 
-                      label="Google Maps Search Link (Optional)" 
-                      placeholder="https://www.google.com/maps/..." 
-                      value={formData.mapLink} 
-                      onChange={(e) => setFormData({...formData, mapLink: e.target.value})} 
-                    />
+                    ></textarea>
                   </div>
+                  <div className="space-y-4">
+                    <label className="block text-sm font-black text-gray-700 uppercase tracking-widest">Pin exact location on map</label>
+                    <div className="rounded-[32px] overflow-hidden border-4 border-gray-50 shadow-inner">
+                      <MapPicker 
+                        onLocationSelect={(coords) => setFormData({...formData, coordinates: [coords.lng, coords.lat]})} 
+                        initialLocation={{lat: 23.8103, lng: 90.4125}}
+                      />
+                    </div>
+                  </div>
+                  <FormInput 
+                    label="Image URL" 
+                    placeholder="https://images.unsplash.com/..." 
+                    value={formData.images[0]} 
+                    onChange={(e) => setFormData({...formData, images: [e.target.value]})} 
+                    required 
+                  />
                 </div>
+              </div>
 
-                <div className="pt-8 border-t border-gray-100 flex gap-6">
-                   <button 
-                    type="submit"
-                    className="flex-1 bg-primary text-white py-6 rounded-[24px] font-black text-xl hover:bg-primary-dark transition shadow-2xl shadow-primary/20 flex items-center justify-center gap-3"
-                  >
-                    Submit Listing <ArrowRightIcon size={24} />
-                  </button>
-                </div>
-              </form>
-            </div>
+              <div className="pt-8 border-t border-gray-100">
+                 <button 
+                  type="submit"
+                  className="w-full bg-primary text-white py-6 rounded-[24px] font-black text-xl hover:bg-primary-dark transition shadow-2xl shadow-primary/20 flex items-center justify-center gap-3"
+                >
+                  Submit Listing <ArrowRightIcon size={24} />
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

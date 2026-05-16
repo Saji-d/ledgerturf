@@ -42,7 +42,11 @@ function App() {
           <Route element={<DashboardLayout><Outlet /></DashboardLayout>}>
             <Route path="/dashboard" element={<DashboardRedirect />} />
             <Route path="/dashboard/player" element={<UserDashboard />} />
-            <Route path="/dashboard/owner" element={<OwnerDashboard />} />
+            <Route path="/dashboard/owner" element={<Navigate to="/dashboard/owner/turfs" replace />} />
+            <Route path="/dashboard/owner/turfs" element={<OwnerDashboard />} />
+            <Route path="/dashboard/owner/reservations" element={<OwnerDashboard />} />
+            <Route path="/dashboard/owner/analytics" element={<OwnerDashboard />} />
+            <Route path="/dashboard/owner/new-listing" element={<OwnerDashboard />} />
             <Route path="/dashboard/admin" element={<AdminDashboard />} />
             <Route path="/dashboard/admin/players" element={<AdminDashboard />} />
             <Route path="/dashboard/admin/owners" element={<AdminDashboard />} />
