@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, MapPin, Calendar, CheckCircle, ArrowRight } from 'lucide-react';
+import { Search, MapPin, Calendar, CheckCircle, ArrowRight, ShieldCheck, Briefcase, Star, Clock, Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Home = () => {
@@ -11,40 +11,45 @@ const Home = () => {
     e.preventDefault();
     if (searchQuery.trim()) {
       navigate(`/turfs?area=${searchQuery}`);
+    } else {
+      navigate('/turfs');
     }
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Hero Section */}
-      <section className="relative bg-gray-900 h-[750px] flex items-center overflow-hidden">
-        <div className="absolute inset-0 z-0 opacity-50">
+    <div className="flex flex-col min-h-screen overflow-x-hidden">
+      {/* Hero Section - Fixed height and overflow */}
+      <section className="relative bg-gray-900 h-[calc(100vh-64px)] min-h-[600px] max-h-[900px] flex items-center overflow-hidden">
+        <div className="absolute inset-0 z-0 opacity-60">
           <img 
             src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=2000" 
             alt="Football pitch" 
             className="w-full h-full object-cover scale-105"
           />
         </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="max-w-3xl text-white"
           >
-            <h1 className="text-6xl md:text-8xl font-black tracking-tight mb-8 leading-tight">
-              Your Game, <br /><span className="text-primary">Your Time.</span>
+            <span className="bg-primary/20 backdrop-blur-md text-primary-light px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest mb-8 inline-block border border-primary/30">
+              Dhaka's #1 Turf Network
+            </span>
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-8 leading-tight">
+              Play Hard, <br /><span className="text-primary">Book Easy.</span>
             </h1>
-            <p className="text-xl text-gray-300 mb-12 leading-relaxed font-medium max-w-xl">
-              Book the finest football and cricket turfs across Dhaka. Real-time availability, instant booking, and premium facilities.
+            <p className="text-lg md:text-xl text-gray-300 mb-10 leading-relaxed font-medium max-w-xl">
+              Instant booking for Dhaka's top-tier football and cricket turfs. Verified facilities and live availability.
             </p>
 
-            <form onSubmit={handleSearch} className="mt-12 bg-white p-2 rounded-[32px] shadow-2xl flex flex-col md:flex-row gap-2 max-w-2xl border border-gray-100">
+            <form onSubmit={handleSearch} className="mt-8 bg-white p-2 rounded-[32px] shadow-2xl flex flex-col md:flex-row gap-2 max-w-2xl border border-gray-100">
               <div className="flex-1 flex items-center px-6">
                 <Search className="text-gray-400 w-6 h-6 mr-4" />
                 <input 
                   type="text" 
-                  placeholder="Search by area (e.g. Uttara, Banani)..." 
+                  placeholder="Where do you want to play? (e.g. Uttara)" 
                   className="w-full py-4 text-gray-900 font-bold outline-none placeholder:text-gray-400"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -54,45 +59,60 @@ const Home = () => {
                 type="submit"
                 className="bg-primary text-white px-10 py-4 rounded-[24px] font-black text-lg hover:bg-primary-dark transition shadow-lg shadow-primary/20"
               >
-                Find Turf
+                Find Pitch
               </button>
             </form>
-
-            <div className="flex flex-col sm:flex-row gap-8 mt-12">
-              <Link 
-                to="/turfs" 
-                className="text-white font-black text-lg flex items-center group bg-white/10 px-6 py-3 rounded-2xl hover:bg-white/20 transition"
-              >
-                Browse All <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition" />
-              </Link>
-              <Link 
-                to="/register/owner" 
-                className="text-primary font-black text-lg flex items-center hover:underline"
-              >
-                List Your Turf & Earn
-              </Link>
-            </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Popular Areas Section */}
-      <section className="py-24 bg-gray-50">
+      {/* Role Selection Section */}
+      <section className="py-24 bg-white relative -mt-16 z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div 
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6"
-          >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <motion.div 
+              whileHover={{ y: -10 }}
+              className="bg-gray-900 p-12 rounded-[48px] text-white flex flex-col justify-between group shadow-2xl min-h-[400px]"
+            >
+              <div>
+                <div className="bg-primary w-16 h-16 rounded-2xl flex items-center justify-center mb-8 group-hover:rotate-12 transition">
+                  <ShieldCheck className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-4xl font-black mb-4">I'm a Player</h3>
+                <p className="text-gray-400 text-lg mb-10">Find games, book slots, and compete with Dhaka's best teams.</p>
+              </div>
+              <Link to="/register/player" className="bg-white text-gray-900 py-5 rounded-[24px] font-black text-center text-xl hover:bg-primary hover:text-white transition">Get Your Ticket</Link>
+            </motion.div>
+
+            <motion.div 
+              whileHover={{ y: -10 }}
+              className="bg-primary p-12 rounded-[48px] text-white flex flex-col justify-between group shadow-2xl min-h-[400px]"
+            >
+              <div>
+                <div className="bg-white/20 w-16 h-16 rounded-2xl flex items-center justify-center mb-8 group-hover:rotate-12 transition">
+                  <Briefcase className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-4xl font-black mb-4">I'm an Owner</h3>
+                <p className="text-primary-light text-lg mb-10">List your facility, manage revenue, and automate your schedule.</p>
+              </div>
+              <Link to="/register/owner" className="bg-gray-900 text-white py-5 rounded-[24px] font-black text-center text-xl hover:bg-white hover:text-gray-900 transition">List Your Turf</Link>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Popular Areas Section */}
+      <section className="py-24 bg-gray-50 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
             <div>
-              <h2 className="text-4xl font-black text-gray-900 leading-tight">Explore by Area</h2>
-              <p className="text-gray-500 mt-4 text-lg font-medium">Find the closest action in your neighborhood.</p>
+              <h2 className="text-5xl font-black text-gray-900 leading-tight">Explore Areas</h2>
+              <p className="text-gray-500 mt-4 text-xl font-medium">The closest pitches in your neighborhood.</p>
             </div>
             <Link to="/turfs" className="bg-white px-8 py-4 rounded-2xl text-primary font-black flex items-center shadow-sm hover:shadow-md transition">
-              View All Areas <ArrowRight className="ml-2 w-4 h-4" />
+              View Map <MapPin className="ml-2 w-5 h-5" />
             </Link>
-          </motion.div>
+          </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {['Uttara', 'Mirpur', 'Banani', 'Gulshan', 'Dhanmondi', 'Bashundhara', 'Badda', 'Khilkhet'].map((area, idx) => (
@@ -101,7 +121,7 @@ const Home = () => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
+                transition={{ delay: idx * 0.05 }}
               >
                 <Link 
                   to={`/turfs?area=${area}`}
@@ -122,54 +142,51 @@ const Home = () => {
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
-            <h2 className="text-5xl font-black text-gray-900 mb-6">Why Choose LedgerTurf?</h2>
-            <p className="text-xl text-gray-500 max-w-2xl mx-auto">We've built the most reliable platform for Dhaka's athletes.</p>
+            <h2 className="text-5xl font-black text-gray-900 mb-6 tracking-tight">Why Choose LedgerTurf?</h2>
+            <p className="text-xl text-gray-500 max-w-2xl mx-auto font-medium">We've built the most reliable platform for Dhaka's athletes.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-left">
             {[
               { 
                 icon: <Search className="w-10 h-10 text-primary" />, 
                 title: "Smart Discovery", 
-                desc: "Find turfs using our GeoJSON map search or area-based filters with real photos." 
+                desc: "Find turfs using our GeoJSON map search or area-based filters with real photos.",
+                link: "/turfs"
               },
               { 
                 icon: <Calendar className="w-10 h-10 text-secondary" />, 
                 title: "Live Booking", 
-                desc: "No more phone calls. Select your slot and book instantly with live availability." 
+                desc: "No more phone calls. Select your slot and book instantly with live availability.",
+                link: "/turfs"
               },
               { 
                 icon: <CheckCircle className="w-10 h-10 text-green-500" />, 
                 title: "Verified Facilities", 
-                desc: "Every turf is vetted by our team to ensure premium grass and amenities." 
+                desc: "Every turf is vetted by our team to ensure premium grass and amenities.",
+                link: "/turfs"
               }
             ].map((feature, idx) => (
-              <div key={idx} className="bg-gray-50 p-12 rounded-[48px] hover:shadow-xl transition-all duration-500 group border border-transparent hover:border-gray-100">
-                <div className="inline-flex items-center justify-center p-6 bg-white rounded-3xl shadow-sm mb-8 group-hover:scale-110 transition duration-500">
+              <Link to={feature.link} key={idx} className="bg-gray-50 p-12 rounded-[48px] hover:shadow-xl transition-all duration-500 group border border-transparent hover:border-gray-100 flex flex-col">
+                <div className="inline-flex items-center justify-center p-6 bg-white rounded-3xl shadow-sm mb-8 group-hover:scale-110 transition duration-500 w-fit">
                   {feature.icon}
                 </div>
                 <h3 className="text-2xl font-black text-gray-900 mb-6">{feature.title}</h3>
-                <p className="text-gray-500 leading-relaxed text-lg">{feature.desc}</p>
-              </div>
+                <p className="text-gray-500 leading-relaxed text-lg font-medium">{feature.desc}</p>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="bg-primary py-24 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="bg-white/10 backdrop-blur-2xl p-16 md:p-24 rounded-[64px] border border-white/20 flex flex-col md:flex-row items-center justify-between gap-12">
-            <div className="text-center md:text-left max-w-lg">
-              <h2 className="text-5xl font-black text-white mb-6 leading-tight">Ready to kick off?</h2>
-              <p className="text-primary-light text-2xl font-medium">Join Dhaka's biggest turf community and book your game today.</p>
-            </div>
-            <Link 
-              to="/register/player" 
-              className="bg-white text-primary px-12 py-6 rounded-[32px] font-black text-2xl hover:shadow-2xl transition duration-300 transform hover:scale-105"
-            >
-              Join Now
-            </Link>
+      {/* Final CTA Section */}
+      <section className="bg-primary py-24 relative overflow-hidden shadow-2xl">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+          <h2 className="text-6xl font-black text-white mb-8 tracking-tight">Game on?</h2>
+          <p className="text-primary-light text-2xl font-medium mb-12 max-w-2xl mx-auto">Dhaka's premier turf booking platform is waiting for you.</p>
+          <div className="flex flex-col sm:flex-row justify-center gap-8">
+            <Link to="/register/player" className="bg-white text-primary px-12 py-6 rounded-[32px] font-black text-2xl hover:shadow-2xl transition duration-300 transform hover:scale-105 shadow-xl">Get Your Ticket</Link>
+            <Link to="/register/owner" className="bg-gray-900 text-white px-12 py-6 rounded-[32px] font-black text-2xl hover:bg-gray-800 transition shadow-xl border border-white/10">Partner with Us</Link>
           </div>
         </div>
       </section>

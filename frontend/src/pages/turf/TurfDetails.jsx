@@ -4,10 +4,12 @@ import { useSelector } from 'react-redux';
 import turfService from '@/services/turfService';
 import bookingService from '@/services/bookingService';
 import { toast } from 'react-hot-toast';
-import { MapPin, Info, Calendar, Clock, CheckCircle, Loader2, ArrowLeft, Star } from 'lucide-react';
+import { MapPin, Info, Calendar, Clock, CheckCircle, Loader2, ArrowLeft, Star, Heart, Phone, Mail } from 'lucide-react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import PaymentModal from '@/components/booking/PaymentModal';
+import api from '@/services/api';
+import { formatTime } from '@/utils/formatters';
 
 const TurfDetails = () => {
   const { id } = useParams();
@@ -21,11 +23,16 @@ const TurfDetails = () => {
   const [selectedSlot, setSelectedSlot] = React.useState(null);
   const [bookingLoading, setBookingLoading] = React.useState(false);
   const [isPaymentOpen, setIsPaymentOpen] = React.useState(false);
+  const [reviews, setReviews] = React.useState([]);
+  const [userReview, setUserReview] = React.useState({ rating: 5, comment: '' });
 
   const timeSlots = [
-    "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", 
-    "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", 
-    "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"
+    { v: "06:00", l: "06:00 AM" }, { v: "07:00", l: "07:00 AM" }, { v: "08:00", l: "08:00 AM" },
+    { v: "09:00", l: "09:00 AM" }, { v: "10:00", l: "10:00 AM" }, { v: "11:00", l: "11:00 AM" },
+    { v: "12:00", l: "12:00 PM" }, { v: "13:00", l: "01:00 PM" }, { v: "14:00", l: "02:00 PM" },
+    { v: "15:00", l: "03:00 PM" }, { v: "16:00", l: "04:00 PM" }, { v: "17:00", l: "05:00 PM" },
+    { v: "18:00", l: "06:00 PM" }, { v: "19:00", l: "07:00 PM" }, { v: "20:00", l: "08:00 PM" },
+    { v: "21:00", l: "09:00 PM" }, { v: "22:00", l: "10:00 PM" }
   ];
 
   const fetchDetails = async () => {
@@ -55,149 +62,299 @@ const TurfDetails = () => {
     }
   };
 
+  const fetchReviews = async () => {
+    try {
+      const res = await api.get(`/reviews/turf/${id}`);
+      setReviews(res.data.data);
+    } catch (error) {
+      console.error('Could not fetch reviews');
+    }
+  };
+
   React.useEffect(() => {
     fetchDetails();
+    fetchReviews();
   }, [id]);
 
   React.useEffect(() => {
     if (turf) fetchAvailability();
   }, [turf, selectedDate]);
 
+  const handleBookingClick = () => {
+    if (!user) {
+      toast.error('Please login to book a turf');
+      return navigate('/login', { state: { from: { pathname: `/turfs/${id}` } } });
+    }
+    if (!selectedSlot) return toast.error('Please select a time slot');
+    setIsPaymentOpen(true);
+  };
+
+  const onPaymentConfirm = async () => {
+    setIsPaymentOpen(false);
+    setBookingLoading(true);
+    try {
+      const startTime = selectedSlot;
+      const [h, m] = startTime.split(':').map(Number);
+      const endTime = `${String(h + 1).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+      
+      const res = await bookingService.createBooking({
+        turf: id,
+        date: selectedDate.toISOString().split('T')[0],
+        startTime,
+        endTime
+      });
+
+      if (res.success) {
+        toast.success('Booking Successful! ✅');
+        navigate('/dashboard/player');
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Booking failed');
+    } finally {
+      setBookingLoading(false);
+    }
+  };
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await api.post(`/reviews/turf/${id}`, userReview);
+      toast.success('Review submitted!');
+      fetchReviews();
+      fetchDetails();
+      setUserReview({ rating: 5, comment: '' });
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to submit review');
+    }
+  };
+
+  if (loading) return (
+    <div className="flex items-center justify-center py-40">
+      <Loader2 className="w-12 h-12 text-primary animate-spin" />
+    </div>
+  );
+
   return (
     <div className="bg-gray-50 min-h-screen pb-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <button 
           onClick={() => navigate(-1)}
-          className="flex items-center text-gray-500 hover:text-primary mb-8 font-bold transition"
+          className="flex items-center text-gray-500 hover:text-primary mb-10 font-black transition-all group"
         >
-          <ArrowLeft className="w-5 h-5 mr-2" /> Back to Search
+          <ArrowLeft className="w-6 h-6 mr-2 group-hover:-translate-x-1 transition" /> Back to Search
         </button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* Left Column: Details & Images */}
-          <div className="lg:col-span-2 space-y-8">
-            <div className="bg-white rounded-[40px] overflow-hidden shadow-sm border border-gray-100">
-              <div className="aspect-video relative">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
+          <div className="lg:col-span-2 space-y-12">
+            {/* Header Card */}
+            <div className="bg-white rounded-[64px] overflow-hidden shadow-2xl border border-gray-100">
+              <div className="aspect-[21/9] relative">
                 <img 
-                  src={turf.images[0] || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=1200'} 
+                  src={turf.images?.[0] || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=1200'} 
                   alt={turf.name}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute top-6 left-6 flex gap-2">
-                  {turf.sportTypes.map(s => (
-                    <span key={s} className="bg-primary/90 backdrop-blur text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest">{s}</span>
+                <div className="absolute top-8 left-8 flex gap-4">
+                  {turf.sportTypes?.map(s => (
+                    <span key={s} className="bg-primary/90 backdrop-blur-xl text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest shadow-2xl">{s}</span>
                   ))}
-                  <span className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest ${turf.isIndoor ? 'bg-secondary text-white' : 'bg-orange-500 text-white'}`}>
-                    {turf.isIndoor ? 'Indoor' : 'Outdoor'}
-                  </span>
                 </div>
+                <button className="absolute top-8 right-8 bg-white/20 backdrop-blur-xl p-4 rounded-3xl hover:bg-red-500 transition-all hover:text-white text-white shadow-2xl">
+                  <Heart size={24} />
+                </button>
               </div>
-              <div className="p-10">
-                <h1 className="text-4xl font-extrabold text-gray-900 mb-4">{turf.name}</h1>
-                <div className="flex items-center text-gray-500 mb-8 pb-8 border-b border-gray-50">
-                  <MapPin className="w-6 h-6 mr-2 text-primary" />
-                  <span className="text-lg font-medium">{turf.address}</span>
+              
+              <div className="p-12 md:p-16">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+                  <div>
+                    <h1 className="text-5xl font-black text-gray-900 mb-4 tracking-tighter leading-tight">{turf.name}</h1>
+                    <div className="flex items-center text-gray-400 text-lg font-bold">
+                      <MapPin className="w-6 h-6 mr-2 text-primary" />
+                      {turf.address}
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    <div className="flex items-center gap-2 bg-yellow-50 px-6 py-3 rounded-3xl border border-yellow-100">
+                      <Star size={24} className="text-yellow-500 fill-yellow-500" />
+                      <span className="text-2xl font-black text-yellow-700">{turf.averageRating || 'New'}</span>
+                    </div>
+                    <span className="text-xs font-black text-gray-400 uppercase tracking-widest mr-2">Player Rating</span>
+                  </div>
                 </div>
                 
-                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                  <Info className="w-5 h-5 mr-2 text-primary" /> About this turf
-                </h2>
-                <p className="text-gray-600 leading-relaxed text-lg mb-8">
-                  {turf.description}
-                </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                   <div className="bg-gray-50 p-8 rounded-[40px] border border-gray-100 text-center">
+                    <Clock className="w-8 h-8 text-primary mx-auto mb-4" />
+                    <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest block mb-1">Operating Hours</span>
+                    <span className="text-lg font-black text-gray-900">{formatTime(turf.openingTime)} - {formatTime(turf.closingTime)}</span>
+                  </div>
+                  <div className="bg-gray-50 p-8 rounded-[40px] border border-gray-100 text-center">
+                    <CheckCircle className="w-8 h-8 text-green-500 mx-auto mb-4" />
+                    <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest block mb-1">Status</span>
+                    <span className="text-lg font-black text-gray-900">Verified Facility</span>
+                  </div>
+                  <div className="bg-gray-50 p-8 rounded-[40px] border border-gray-100 text-center">
+                    <Info className="w-8 h-8 text-secondary mx-auto mb-4" />
+                    <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest block mb-1">Pitch Type</span>
+                    <span className="text-lg font-black text-gray-900">{turf.isIndoor ? 'Indoor' : 'Outdoor'}</span>
+                  </div>
+                </div>
 
-                <div className="bg-gray-50 rounded-3xl p-8 border border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="flex flex-col items-center text-center">
-                    <CheckCircle className="w-6 h-6 text-green-500 mb-2" />
-                    <span className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Status</span>
-                    <span className="font-bold text-gray-800">Available</span>
+                <div className="space-y-6">
+                  <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter">About the facility</h3>
+                  <p className="text-gray-500 text-lg leading-relaxed font-medium">{turf.description}</p>
+                </div>
+
+                {/* Owner Info for Admins/Players */}
+                <div className="mt-12 pt-12 border-t border-gray-50 flex flex-wrap gap-12">
+                  <div className="flex items-center gap-4">
+                    <div className="bg-primary/10 p-4 rounded-2xl"><Phone className="text-primary" /></div>
+                    <div>
+                      <span className="text-[10px] text-gray-400 font-black uppercase block">Call to Inquire</span>
+                      <span className="font-black text-gray-900">{turf.owner?.phone || '01XXXXXXXXX'}</span>
+                    </div>
                   </div>
-                  <div className="flex flex-col items-center text-center">
-                    <Clock className="w-6 h-6 text-primary mb-2" />
-                    <span className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Hours</span>
-                    <span className="font-bold text-gray-800">06:00 AM - 12:00 AM</span>
-                  </div>
-                  <div className="flex flex-col items-center text-center">
-                    <Star className="w-6 h-6 text-yellow-500 mb-2" />
-                    <span className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Rating</span>
-                    <span className="font-bold text-gray-800">{turf.averageRating || 'New'}</span>
+                  <div className="flex items-center gap-4">
+                    <div className="bg-secondary/10 p-4 rounded-2xl"><Mail className="text-secondary" /></div>
+                    <div>
+                      <span className="text-[10px] text-gray-400 font-black uppercase block">Support Email</span>
+                      <span className="font-black text-gray-900">{turf.owner?.email || 'support@pitch.com'}</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Right Column: Booking Widget */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-[40px] p-8 shadow-2xl border border-gray-100 sticky top-28">
-              <div className="flex justify-between items-end mb-8">
-                <span className="text-gray-400 text-sm font-bold uppercase tracking-wider">Price / Hour</span>
-                <span className="text-3xl font-extrabold text-gray-900">৳{turf.pricePerHour}</span>
+            {/* Reviews Section */}
+            <div className="bg-white rounded-[64px] p-12 md:p-16 shadow-2xl border border-gray-100">
+              <h2 className="text-4xl font-black text-gray-900 mb-12 tracking-tight flex items-center gap-4">
+                Recent Reviews
+                <span className="bg-gray-100 px-4 py-1 rounded-2xl text-lg text-gray-500">{reviews.length}</span>
+              </h2>
+
+              <div className="space-y-12 mb-16">
+                {reviews.length > 0 ? (
+                  reviews.map((rev) => (
+                    <div key={rev._id} className="flex gap-8 group">
+                      <div className="bg-primary/10 w-16 h-16 rounded-3xl flex items-center justify-center font-black text-primary text-xl flex-shrink-0">
+                        {rev.user?.name?.[0] || 'P'}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex justify-between items-center mb-2">
+                          <h4 className="text-xl font-black text-gray-900">{rev.user?.name}</h4>
+                          <div className="flex gap-1">
+                            {[...Array(5)].map((_, i) => (
+                              <Star key={i} size={14} className={`${i < rev.rating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-200'}`} />
+                            ))}
+                          </div>
+                        </div>
+                        <p className="text-gray-500 text-lg leading-relaxed italic">"{rev.comment}"</p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="py-20 text-center bg-gray-50 rounded-[40px] border border-dashed border-gray-200">
+                    <Star className="mx-auto text-gray-200 mb-4" size={48} />
+                    <p className="text-gray-400 font-bold italic text-lg">No reviews yet. Be the first to play!</p>
+                  </div>
+                )}
               </div>
 
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-bold text-gray-900 mb-3 flex items-center">
-                    <Calendar className="w-4 h-4 mr-2 text-primary" /> Select Date
-                  </label>
-                  <DatePicker 
-                    selected={selectedDate} 
-                    onChange={(date) => setSelectedDate(date)}
-                    minDate={new Date()}
-                    className="w-full p-4 bg-gray-50 border border-transparent rounded-2xl focus:ring-2 focus:ring-primary font-bold text-gray-700 cursor-pointer transition"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-gray-900 mb-3 flex items-center">
-                    <Clock className="w-4 h-4 mr-2 text-primary" /> Available Slots (1 Hour)
-                  </label>
-                  <div className="grid grid-cols-3 gap-3">
-                    {timeSlots.map(slot => {
-                      const isBooked = unavailableSlots.includes(slot);
-                      const isSelected = selectedSlot === slot;
-                      return (
+              {user && user.role === 'player' && (
+                <div className="bg-gray-900 p-12 rounded-[48px] text-white">
+                  <h3 className="text-3xl font-black mb-8 leading-tight">Rate your game</h3>
+                  <form onSubmit={handleReviewSubmit} className="space-y-8">
+                    <div className="flex gap-4">
+                      {[1, 2, 3, 4, 5].map((num) => (
                         <button
-                          key={slot}
-                          disabled={isBooked}
-                          onClick={() => setSelectedSlot(slot)}
-                          className={`py-3 rounded-xl text-sm font-bold transition border-2 ${
-                            isBooked 
-                              ? 'bg-gray-100 text-gray-300 border-transparent cursor-not-allowed' 
-                              : isSelected 
-                                ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20' 
-                                : 'bg-white text-gray-600 border-gray-50 hover:border-primary/50'
-                          }`}
+                          key={num}
+                          type="button"
+                          onClick={() => setUserReview({ ...userReview, rating: num })}
+                          className={`w-14 h-14 rounded-2xl transition-all flex items-center justify-center ${userReview.rating >= num ? 'bg-primary text-white' : 'bg-white/10 text-gray-400'}`}
                         >
-                          {slot}
+                          <Star className={`${userReview.rating >= num ? 'fill-white' : ''}`} size={24} />
                         </button>
-                      );
-                    })}
-                  </div>
+                      ))}
+                    </div>
+                    <textarea
+                      required
+                      value={userReview.comment}
+                      onChange={(e) => setUserReview({ ...userReview, comment: e.target.value })}
+                      className="w-full p-8 rounded-[32px] bg-white/5 border border-white/10 focus:border-primary outline-none transition font-medium h-40 resize-none text-white text-lg"
+                      placeholder="Was the grass perfect? How was the lighting?"
+                    ></textarea>
+                    <button type="submit" className="bg-primary text-white px-10 py-5 rounded-2xl font-black text-xl hover:bg-primary-dark transition shadow-2xl shadow-primary/20">Post Review</button>
+                  </form>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-[56px] p-10 shadow-2xl border border-gray-100 sticky top-28 overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16"></div>
+              <div className="relative z-10">
+                <div className="flex justify-between items-end mb-10">
+                  <span className="text-gray-400 text-xs font-black uppercase tracking-widest">Rate / Hour</span>
+                  <span className="text-4xl font-black text-gray-900 tracking-tighter">৳{turf.pricePerHour}</span>
                 </div>
 
-                <div className="pt-6 border-t border-gray-50">
-                  <div className="flex justify-between mb-4">
-                    <span className="text-gray-500 font-medium">Subtotal</span>
-                    <span className="text-gray-900 font-bold">৳{turf.pricePerHour}</span>
-                  </div>
-                  <div className="flex justify-between mb-6">
-                    <span className="text-gray-500 font-medium">Service Fee</span>
-                    <span className="text-gray-900 font-bold">৳0</span>
-                  </div>
-                  <div className="flex justify-between mb-8 pb-4 border-b border-gray-50">
-                    <span className="text-gray-900 font-extrabold text-lg">Total</span>
-                    <span className="text-primary font-extrabold text-2xl">৳{turf.pricePerHour}</span>
+                <div className="space-y-8">
+                  <div className="space-y-4">
+                    <label className="block text-sm font-black text-gray-700 uppercase tracking-widest flex items-center gap-2">
+                      <Calendar className="text-primary w-4 h-4" /> Pick Date
+                    </label>
+                    <DatePicker 
+                      selected={selectedDate} 
+                      onChange={(date) => setSelectedDate(date)}
+                      minDate={new Date()}
+                      className="w-full p-5 bg-gray-50 border-2 border-gray-50 rounded-2xl focus:bg-white focus:border-primary font-black text-gray-800 cursor-pointer transition outline-none"
+                    />
                   </div>
 
-                  <button 
-                    disabled={bookingLoading}
-                    onClick={handleBookingClick}
-                    className="w-full py-5 bg-primary text-white rounded-2xl font-extrabold text-lg hover:bg-primary-dark transition shadow-xl shadow-primary/30 flex items-center justify-center disabled:opacity-50"
-                  >
-                    {bookingLoading ? <Loader2 className="animate-spin" /> : 'Confirm Booking'}
-                  </button>
-                  <p className="text-center text-[10px] text-gray-400 mt-4 uppercase tracking-widest font-bold">Secure Payment Simulation</p>
+                  <div className="space-y-4">
+                    <label className="block text-sm font-black text-gray-700 uppercase tracking-widest flex items-center gap-2">
+                      <Clock className="text-primary w-4 h-4" /> Select Slot
+                    </label>
+                    <div className="grid grid-cols-3 gap-3">
+                      {timeSlots.map(slot => {
+                        const isBooked = unavailableSlots.includes(slot.v);
+                        const isSelected = selectedSlot === slot.v;
+                        return (
+                          <button
+                            key={slot.v}
+                            disabled={isBooked}
+                            onClick={() => setSelectedSlot(slot.v)}
+                            className={`py-4 rounded-2xl text-xs font-black transition-all border-2 ${
+                              isBooked 
+                                ? 'bg-gray-100 text-gray-200 border-transparent cursor-not-allowed opacity-50' 
+                                : isSelected 
+                                  ? 'bg-primary text-white border-primary shadow-xl shadow-primary/20' 
+                                  : 'bg-white text-gray-600 border-gray-100 hover:border-primary/50'
+                            }`}
+                          >
+                            {slot.l}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="pt-8 border-t border-gray-100">
+                    <div className="flex justify-between mb-8 pb-4 border-b border-gray-50">
+                      <span className="text-gray-900 font-black text-xl uppercase tracking-tighter">Total</span>
+                      <span className="text-primary font-black text-3xl tracking-tighter">৳{turf.pricePerHour}</span>
+                    </div>
+
+                    <button 
+                      disabled={bookingLoading}
+                      onClick={handleBookingClick}
+                      className="w-full py-6 bg-gray-900 text-white rounded-[24px] font-black text-xl hover:bg-primary transition-all duration-300 shadow-2xl flex items-center justify-center group"
+                    >
+                      {bookingLoading ? <Loader2 className="animate-spin" /> : 'Confirm Booking'}
+                    </button>
+                    <p className="mt-6 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest leading-loose italic">Secure instant payment demonstration enabled.</p>
+                  </div>
                 </div>
               </div>
             </div>

@@ -1,3 +1,4 @@
+import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
@@ -8,7 +9,10 @@ const ProtectedRoute = ({ allowedRoles }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
+  // Support both 'player' and 'user' strings for flexibility during transition
+  const normalizedUserRole = user.role === 'user' ? 'player' : user.role;
+
+  if (allowedRoles && !allowedRoles.includes(normalizedUserRole)) {
     return <Navigate to="/" replace />;
   }
 

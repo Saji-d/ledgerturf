@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const User = require('./src/models/User');
 const Turf = require('./src/models/Turf');
 const Booking = require('./src/models/Booking');
+const Review = require('./src/models/Review');
 const { USER_ROLES, TURF_STATUS, BOOKING_STATUS } = require('./src/utils/constants');
 
 dotenv.config();
@@ -17,13 +18,14 @@ const seedData = async () => {
     await User.deleteMany();
     await Turf.deleteMany();
     await Booking.deleteMany();
+    await Review.deleteMany();
 
     // Create SuperAdmin
     await User.create({
       name: 'Super Admin',
       email: 'admin@ledgerturf.com',
       password: 'password123',
-      phone: '01700000000',
+      phone: '01711111111',
       role: USER_ROLES.SUPER_ADMIN,
     });
 
@@ -60,7 +62,7 @@ const seedData = async () => {
         pricePerHour: 1200 + (Math.floor(Math.random() * 10) * 100),
         status: i % 5 === 0 ? TURF_STATUS.PENDING : TURF_STATUS.APPROVED,
         isIndoor: i % 3 === 0,
-        averageRating: 4 + Math.random(),
+        averageRating: 0,
         openingTime: '06:00',
         closingTime: '23:00',
         images: [`https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=800&id=${i}`]
@@ -77,20 +79,32 @@ const seedData = async () => {
       role: USER_ROLES.PLAYER,
     });
 
+    // Create some Bookings
+    const today = new Date();
     for (let i = 0; i < 5; i++) {
-      await Booking.create({
+      const booking = await Booking.create({
         user: player._id,
         turf: turfs[i]._id,
-        date: new Date(),
-        startTime: '18:00',
-        endTime: '19:00',
+        date: today,
+        startTime: `${16 + i}:00`,
+        endTime: `${17 + i}:00`,
         totalPrice: turfs[i].pricePerHour,
         status: BOOKING_STATUS.CONFIRMED,
         paymentStatus: 'paid',
       });
+
+      // Add a Review for the first 3 turfs
+      if (i < 3) {
+        await Review.create({
+          user: player._id,
+          turf: turfs[i]._id,
+          rating: 4 + (i % 2 === 0 ? 1 : 0),
+          comment: 'Great field and lighting. Had a good match!'
+        });
+      }
     }
 
-    console.log('Seeded 1 Admin, 5 Owners, 15 Turfs (with images & roles), and 1 Player with bookings.');
+    console.log('Database seeded with 1 Admin, 5 Owners, 15 Turfs, 1 Player, 5 Bookings and 3 Reviews.');
     process.exit();
   } catch (error) {
     console.error('Error seeding data:', error);

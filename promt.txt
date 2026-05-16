@@ -1,295 +1,367 @@
-You are now upgrading LedgerTurf from a frontend prototype into a production-style MERN SaaS application.
+Perform another FULL runtime + UX audit of LedgerTurf.
 
-Implement ALL of the following improvements across backend, frontend, MongoDB schemas, API routes, dashboards, and UI logic.
+DO NOT generate fake “fixed” reports.
+DO NOT only edit markdown/docs.
+Actually implement, run, test, and verify everything below in browser runtime.
 
-========================
+==================================================
+1. PLAYER PHONE VALIDATION IS STILL BROKEN
+==================================================
 
-1. ROLE-BASED AUTH SYSTEM
-   ========================
+Current issue:
+- Even valid Bangladeshi numbers like:
+  01954832959
+still trigger:
+  “Please add a phone number”
 
-Separate the system into 3 roles:
+FIX:
+- Frontend and backend validation mismatch must be fixed.
 
-* PLAYER
-* TURF_OWNER
-* SUPER_ADMIN
+VALID FORMAT:
+- Exactly 11 digits
+- Starts with:
+  013
+  014
+  015
+  016
+  017
+  018
+  019
 
-Update:
+Regex:
+^01[3-9]\d{8}$
 
-* auth middleware
-* JWT payloads
-* protected routes
-* frontend redirects
+REQUIREMENTS:
+- Trim spaces automatically
+- Accept only digits
+- Show inline validation below input
+- Remove broken top-right toast spam
 
-After login:
+==================================================
+2. REMOVE OLD /register PAGE COMPLETELY
+==================================================
 
-* PLAYER -> /dashboard/player
-* TURF_OWNER -> /dashboard/owner
-* SUPER_ADMIN -> /dashboard/admin
+Current issue:
+- Navbar “Join Now” still routes to old:
+  /register
 
-Create proper role guards for routes.
+That page still contains:
+- old player card
+- old registration form
+- no phone input
+- inconsistent auth flow
 
-========================
-2. SEPARATE REGISTRATION FLOWS
-==============================
+FIX:
+- DELETE the old registration UI entirely.
+- Replace all Join Now buttons everywhere with:
+  /register/player
 
-Create:
+PLAYER CARD:
+- should still exist visually
+- but clicking it loads:
+  /register/player
 
-/register/player
-/register/owner
+OWNER CARD:
+- should load:
+  /register/owner
 
-PLAYER registration fields:
+==================================================
+3. OWNER REGISTRATION PAGE UX IS BROKEN
+==================================================
 
-* full name
-* email
-* password
-* phone
+Current issue:
+- Layout becomes broken/misaligned
+- Inputs overflow
+- UI not centered
+- Looks unfinished
 
-OWNER registration fields:
+FIX UI:
+- Proper responsive grid layout
+- Center aligned
+- Mobile responsive
+- Modern SaaS styling
 
-* owner name
-* email
-* password
-* phone
-* turf/business name
-* turf address
-* Google Maps location
-* sports type
-* opening time
-* closing time
-* price per hour
-* turf description
-* multiple turf images upload
+==================================================
+4. OWNER REGISTRATION NEEDS REAL TURF DATA
+==================================================
 
-========================
-3. TURF APPROVAL SYSTEM
-=======================
+Current form is insufficient.
 
-Add approval workflow.
+IMPLEMENT THESE FIELDS:
 
-Turf schema must include:
+OWNER INFO:
+- Full Name
+- Email
+- Phone
+- Password
 
-* status:
+TURF INFO:
+- Turf Name
+- Turf Description
+- Sport Type
+- Price Per Hour
+- Opening Time
+- Closing Time
 
-  * pending
-  * approved
-  * rejected
+LOCATION:
+- Google Maps picker
+- Owner places pin on map
+- Save:
+  latitude
+  longitude
+  formatted address
 
-When owner submits turf:
+REMOVE:
+- static area dropdown only approach
 
-* save as pending
-* NOT visible publicly
+AREA should auto-detect from selected map location.
 
-SUPER_ADMIN dashboard must show:
+MEDIA:
+- Upload multiple turf images
+- Preview images before submit
 
-* pending turf requests
-* turf images
-* owner info
-* approve button
-* reject button
+==================================================
+5. GOOGLE MAPS IS BROKEN
+==================================================
 
-Only approved turfs appear publicly.
+Current issue:
+“Oops! Something went wrong.”
 
-========================
-4. DUMMY DATA / SEEDING
-=======================
+FIX:
+- Proper Google Maps API integration
+- Ensure API key loads correctly from .env
+- Handle missing API gracefully
+- No blank map containers
 
-Create realistic dummy turf data for Dhaka areas:
+IMPLEMENT:
+- Map/List toggle
+- Turf pins
+- Clicking pin opens mini turf card
+- Clicking mini card opens turf details page
 
-* Uttara
-* Mirpur
-* Banani
-* Dhanmondi
-* Gulshan
-* Bashundhara
-* Mohammadpur
-* Badda
+==================================================
+6. HOMEPAGE HERO SECTION OVERFLOWS SCREEN
+==================================================
 
-Each turf must contain:
+Current issue:
+- Grass/hero section goes under viewport
+- Layout slightly cut off
 
-* real-looking turf name
-* images
-* coordinates
-* sports supported
-* ratings
-* price
-* available slots
-* description
-* owner info
+FIX:
+- Proper responsive height
+- Prevent overflow
+- Ensure first fold fits correctly
 
-Seed at least 15 realistic turfs into MongoDB.
+==================================================
+7. USE AM/PM TIME FORMAT
+==================================================
 
-========================
-5. FUNCTIONAL SEARCH SYSTEM
-===========================
+We are building for Bangladesh users.
 
-Implement REAL filtering and search.
-
-Search must work by:
-
-* area
-* sport type
-* price range
-* rating
-* availability
-* nearby location
+CHANGE:
+- 24-hour time format
+TO:
+- 12-hour AM/PM format
 
 Use:
+- 6:00 AM
+- 11:00 PM
 
-* MongoDB query filtering
-* URL search params
-* debounced frontend search
+Apply everywhere:
+- owner registration
+- turf details
+- booking slots
+- admin
+- dashboards
 
-========================
-6. GOOGLE MAPS INTEGRATION
-==========================
+==================================================
+8. ERROR MESSAGES NEED MODERN UX
+==================================================
 
-Improve map functionality.
+Current issue:
+- Top-right ugly error popup
+- Poor visibility
 
-Requirements:
+IMPLEMENT:
+- Modern inline validation
+- Animated error states
+- Highlight incorrect field
+- Toasts only for success/global failures
 
-* show all approved turfs on map
-* clickable markers
-* user current location
-* nearby turf suggestions
-* route distance calculation
-* location-based filtering
+Use:
+- red border
+- helper text below field
+- shake animation optional
 
-========================
-7. PLAYER DASHBOARD
-===================
+==================================================
+9. SUPERADMIN APPROVAL SYSTEM IS TOO BASIC
+==================================================
 
-Build a proper player dashboard showing:
+Before approving a turf,
+admin must see FULL details.
 
-* upcoming bookings
-* booking history
-* favorite turfs
-* payment history
-* profile settings
+ADMIN TURF REVIEW PAGE MUST SHOW:
+- Turf images
+- Turf description
+- Owner name
+- Owner phone
+- Owner email
+- Turf location on Google Maps
+- Coordinates
+- Pricing
+- Opening/closing time
+- Sport type
 
-========================
-8. OWNER DASHBOARD
-==================
+ADMIN ACTIONS:
+- Approve
+- Reject
+- Suspend later
 
-Build advanced owner dashboard:
+==================================================
+10. SUPERADMIN MUST MANAGE ALL USERS
+==================================================
 
-* all listed turfs
-* booking analytics
-* revenue stats
-* slot management
-* booking calendar
-* edit turf details
-* upload turf images
-* pending approval status
+IMPLEMENT FULL ADMIN CRUD:
 
-========================
-9. ADMIN DASHBOARD
-==================
+PLAYERS:
+- list all players
+- edit
+- suspend
+- delete
 
-Build a powerful admin panel:
+OWNERS:
+- list all owners
+- edit
+- suspend
+- delete
 
-* approve/reject turfs
-* manage users
-* delete fake listings
-* dashboard analytics
-* total bookings
-* total revenue
-* active users
-* active owners
+TURFS:
+- edit turf
+- suspend turf
+- delete turf
 
-========================
-10. SLOT BOOKING SYSTEM
-=======================
+==================================================
+11. PLAYER BOOKINGS PAGE NEEDS DETAIL VIEW
+==================================================
 
-Implement FULL real-time slot booking logic.
+After booking,
+player should NOT lose turf details.
 
-Requirements:
-
-* selectable dates
-* selectable time slots
-* prevent double booking
-* booked slots disabled
-* booking confirmation
-* booking cancellation
-* concurrency-safe booking logic
-
-========================
-11. PAYMENT SIMULATION
-======================
-
-Improve payment flow:
-
-* bKash UI
-* Nagad UI
-* Card UI
+IMPLEMENT:
+- Booking history page
+- Clicking booking opens:
+  - turf images
+  - map
+  - location
+  - pricing
+  - booking slot
+  - owner contact
+  - navigation link
 
 Add:
+- modern sidebar navigation
 
-* fake payment processing
-* booking only completes after successful payment
+==================================================
+12. SEARCH BREAKS AFTER LOGIN
+==================================================
 
-========================
-12. LANDING PAGE IMPROVEMENTS
-=============================
+Current issue:
+- Search works before login
+- Breaks after login
 
-Fix homepage buttons and interactions.
+FIX:
+- unify public/private turf queries
+- ensure auth state does not break filters
 
-Requirements:
+SEARCH MUST SUPPORT:
+- area search
+- turf name search
+- fuzzy search
 
-* “Find Turf” should navigate properly
-* “Book a Turf” should work
-* “List Your Turf” should open owner onboarding
-* area cards should filter turfs
-* search bar must function
-* all CTAs should navigate correctly
+Examples:
+- “Mirpur”
+- “Bashundhara”
+- “Gulshan Football Arena”
 
-========================
-13. BETTER UI/UX
-================
+==================================================
+13. OWNER DASHBOARD NEEDS IMPROVEMENT
+==================================================
 
-Improve overall polish:
+IMPLEMENT:
+- Sidebar navigation
+- Revenue analytics
+- Booking history
+- Upcoming reservations
+- Turf performance stats
+- Pending approval status
+- Turf edit functionality
+- Image management
+- Slot management
 
-* skeleton loaders
-* empty states
-* animations
-* responsive design
-* toast notifications
-* loading states
-* error handling
-* hover states
+==================================================
+14. BOOKING SYSTEM STILL INCOMPLETE
+==================================================
 
-========================
-14. BACKEND IMPROVEMENTS
-========================
+IMPLEMENT REAL SLOT FLOW:
 
-Improve backend architecture:
+USER CHOOSES:
+- date
+- start time
+- end time
 
-* validation
-* centralized error handling
-* pagination
-* secure auth
-* rate limiting
-* image upload handling
-* optimized MongoDB queries
+SYSTEM RETURNS:
+- only available turfs
 
-========================
-15. FINAL GOAL
-==============
+TURF DETAILS:
+- show available slots
+- disable booked slots
 
-Transform LedgerTurf into a realistic production-style turf booking SaaS suitable for:
+BOOKING:
+- save booking
+- prevent conflicts
+- show booking success screen
 
-* university capstone
-* portfolio showcase
-* deployment demo
+==================================================
+15. RATINGS & REVIEWS
+==================================================
 
-Do NOT just create UI placeholders.
+IMPLEMENT:
+- Players can rate after booking
+- 1–5 stars
+- review text
 
-Implement real backend logic, MongoDB models, API routes, protected dashboards, and working functionality throughout the application.
+DISPLAY:
+- average rating on turf cards
+- detailed reviews section
 
-After completion:
+==================================================
+16. FINAL VERIFICATION
+==================================================
 
-* explain all new features
-* explain new routes
-* explain MongoDB schema changes
-* explain how to run seeders
-* explain how to use admin accounts
-* explain how to test bookings and approvals
+After ALL fixes:
+
+RUN:
+- backend
+- frontend
+- seeders
+
+MANUALLY TEST:
+- player registration
+- owner registration
+- login
+- dashboards
+- admin approval
+- search
+- map
+- booking
+- reviews
+- uploads
+
+Then provide:
+1. exact files modified
+2. exact runtime bugs fixed
+3. verified working routes
+4. remaining known issues
+5. screenshots of working flows
+
+DO NOT CLAIM FEATURES WORK UNLESS VERIFIED IN RUNTIME.

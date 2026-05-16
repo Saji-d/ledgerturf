@@ -20,6 +20,11 @@ const userSchema = new mongoose.Schema(
     phone: {
       type: String,
       required: [true, 'Please add a phone number'],
+      trim: true,
+      match: [
+        /^01[3-9]\d{8}$/,
+        'Please add a valid Bangladeshi phone number (e.g. 017XXXXXXXX)',
+      ],
     },
     password: {
       type: String,

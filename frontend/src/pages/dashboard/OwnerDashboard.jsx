@@ -2,16 +2,22 @@ import React from 'react';
 import turfService from '@/services/turfService';
 import bookingService from '@/services/bookingService';
 import { useSelector } from 'react-redux';
-import { LayoutGrid, Plus, Clock, Users, DollarSign, Loader2, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { 
+  LayoutGrid, Plus, Clock, Users, DollarSign, Loader2, 
+  CheckCircle, XCircle, AlertCircle, Edit, Trash2, Camera
+} from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { formatTime } from '@/utils/formatters';
 
 const OwnerDashboard = () => {
   const { user } = useSelector((state) => state.auth);
   const [turfs, setTurfs] = React.useState([]);
   const [bookings, setBookings] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  const [tab, setTab] = React.useState('turfs'); // 'turfs', 'bookings', 'analytics'
 
   const fetchData = async () => {
+    setLoading(true);
     try {
       const [turfsRes, bookingsRes] = await Promise.all([
         turfService.getTurfs({ owner: user.id }),
@@ -34,115 +40,131 @@ const OwnerDashboard = () => {
     .filter(b => b.status === 'confirmed' || b.status === 'completed')
     .reduce((acc, b) => acc + b.totalPrice, 0);
 
-  if (loading) return (
-    <div className="flex items-center justify-center py-40">
-      <Loader2 className="w-12 h-12 text-primary animate-spin" />
-    </div>
-  );
+  if (loading) return <div className="flex items-center justify-center py-40"><Loader2 className="animate-spin text-primary w-12 h-12" /></div>;
 
   return (
-    <div className="bg-gray-50 min-h-screen py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
-          <div>
-            <h1 className="text-3xl font-extrabold text-gray-900">Owner Dashboard</h1>
-            <p className="text-gray-500 mt-2 text-lg">Manage your turfs and monitor reservations.</p>
-          </div>
-          <button className="bg-primary text-white px-8 py-4 rounded-2xl font-bold flex items-center hover:bg-primary-dark transition shadow-lg shadow-primary/20">
-            <Plus className="w-5 h-5 mr-2" /> Add New Turf
-          </button>
-        </header>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-          <div className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100">
-            <div className="bg-blue-50 w-12 h-12 rounded-2xl flex items-center justify-center mb-4">
-              <LayoutGrid className="text-blue-500 w-6 h-6" />
-            </div>
-            <span className="text-gray-400 text-xs font-bold uppercase tracking-widest block mb-1">Total Turfs</span>
-            <span className="text-3xl font-black text-gray-900">{turfs.length}</span>
-          </div>
-          <div className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100">
-            <div className="bg-green-50 w-12 h-12 rounded-2xl flex items-center justify-center mb-4">
-              <Users className="text-green-500 w-6 h-6" />
-            </div>
-            <span className="text-gray-400 text-xs font-bold uppercase tracking-widest block mb-1">Total Bookings</span>
-            <span className="text-3xl font-black text-gray-900">{bookings.length}</span>
-          </div>
-          <div className="bg-primary p-8 rounded-[40px] shadow-lg shadow-primary/20 text-white">
-            <div className="bg-white/20 w-12 h-12 rounded-2xl flex items-center justify-center mb-4">
-              <DollarSign className="text-white w-6 h-6" />
-            </div>
-            <span className="text-primary-light text-xs font-bold uppercase tracking-widest block mb-1">Total Revenue</span>
-            <span className="text-3xl font-black">৳{totalRevenue}</span>
-          </div>
-          <div className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100">
-            <div className="bg-orange-50 w-12 h-12 rounded-2xl flex items-center justify-center mb-4">
-              <Clock className="text-orange-500 w-6 h-6" />
-            </div>
-            <span className="text-gray-400 text-xs font-bold uppercase tracking-widest block mb-1">Pending Approval</span>
-            <span className="text-3xl font-black text-gray-900">{turfs.filter(t => t.status === 'pending').length}</span>
-          </div>
+    <div className="space-y-12 animate-in fade-in duration-500">
+      <header className="flex flex-col md:row justify-between items-start md:items-center gap-6">
+        <div>
+          <h1 className="text-5xl font-black text-gray-900 tracking-tight">Business Hub</h1>
+          <p className="text-gray-500 font-medium mt-2">Manage your facilities and track growth.</p>
         </div>
+        <div className="bg-white p-1.5 rounded-2xl shadow-sm border border-gray-100 flex gap-1">
+          {['turfs', 'bookings', 'analytics'].map(t => (
+            <button 
+              key={t}
+              onClick={() => setTab(t)}
+              className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${tab === t ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-gray-400 hover:bg-gray-50'}`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Recent Bookings */}
-          <div className="bg-white rounded-[40px] p-8 shadow-sm border border-gray-100">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">Recent Bookings</h2>
-            {bookings.length > 0 ? (
-              <div className="space-y-6">
-                {bookings.slice(0, 5).map(booking => (
-                  <div key={booking._id} className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-3xl transition border border-transparent hover:border-gray-100">
-                    <div>
-                      <h4 className="font-bold text-gray-900">{booking.user?.name}</h4>
-                      <p className="text-xs text-gray-500">{booking.turf?.name} • {booking.startTime}</p>
+      {tab === 'analytics' && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <StatCard icon={DollarSign} label="Net Earnings" val={`৳${totalRevenue}`} color="primary" isPrimary />
+          <StatCard icon={Users} label="Total Players" val={bookings.length} color="blue" />
+          <StatCard icon={CheckCircle} label="Active Listings" val={turfs.filter(t => t.status === 'approved').length} color="green" />
+        </div>
+      )}
+
+      {tab === 'turfs' && (
+        <div className="space-y-8">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-black text-gray-900">Your Facilities</h2>
+            <button className="bg-gray-900 text-white px-6 py-3 rounded-2xl font-black text-sm hover:bg-primary transition shadow-xl shadow-gray-100 flex items-center gap-2">
+              <Plus size={18} /> New Listing
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {turfs.map(turf => (
+              <div key={turf._id} className="bg-white rounded-[40px] overflow-hidden shadow-2xl border border-gray-100 flex flex-col group">
+                <div className="h-48 relative">
+                  <img src={turf.images?.[0]} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="" />
+                  <div className="absolute top-4 right-4">
+                    <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg ${
+                      turf.status === 'approved' ? 'bg-green-500 text-white' : 
+                      turf.status === 'rejected' ? 'bg-red-500 text-white' : 'bg-yellow-400 text-gray-900'
+                    }`}>
+                      {turf.status}
+                    </span>
+                  </div>
+                </div>
+                <div className="p-8 flex-1 flex flex-col">
+                  <h3 className="text-2xl font-black text-gray-900 mb-2">{turf.name}</h3>
+                  <p className="text-gray-400 text-sm font-bold mb-6 flex items-center gap-2">
+                    <MapPin size={14} className="text-primary" /> {turf.location?.area || turf.address}
+                  </p>
+                  <div className="grid grid-cols-2 gap-4 mb-8">
+                    <div className="bg-gray-50 p-4 rounded-2xl">
+                      <span className="text-[10px] text-gray-400 font-black uppercase block mb-1">Price</span>
+                      <span className="font-black text-gray-900 text-lg">৳{turf.pricePerHour}/hr</span>
                     </div>
-                    <div className="text-right">
-                      <span className="font-bold text-gray-900 block">৳{booking.totalPrice}</span>
-                      <span className={`text-[10px] font-bold uppercase tracking-widest ${booking.status === 'confirmed' ? 'text-green-500' : 'text-red-500'}`}>
-                        {booking.status}
-                      </span>
+                    <div className="bg-gray-50 p-4 rounded-2xl">
+                      <span className="text-[10px] text-gray-400 font-black uppercase block mb-1">Hours</span>
+                      <span className="font-black text-gray-900 text-xs">{formatTime(turf.openingTime)} - {formatTime(turf.closingTime)}</span>
                     </div>
                   </div>
-                ))}
+                  <div className="flex gap-3 mt-auto">
+                    <button className="flex-1 bg-gray-50 text-gray-900 py-3 rounded-xl font-black text-xs hover:bg-gray-100 transition flex items-center justify-center gap-2"><Edit size={14} /> Edit</button>
+                    <button className="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 transition"><Trash2 size={16} /></button>
+                  </div>
+                </div>
               </div>
-            ) : (
-              <div className="text-center py-20 text-gray-400">
-                <AlertCircle className="w-10 h-10 mx-auto mb-4 opacity-20" />
-                <p>No bookings received yet.</p>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {tab === 'bookings' && (
+        <div className="bg-white rounded-[48px] shadow-2xl border border-gray-100 overflow-hidden">
+          <div className="p-10 border-b border-gray-50 bg-gray-50/50">
+            <h2 className="text-2xl font-black text-gray-900">Recent Reservations</h2>
+          </div>
+          <div className="divide-y divide-gray-50">
+            {bookings.length > 0 ? bookings.map(b => (
+              <div key={b._id} className="p-8 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                <div className="flex items-center gap-6">
+                  <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary"><Users size={24} /></div>
+                  <div>
+                    <h4 className="font-black text-gray-900 text-lg">{b.user?.name}</h4>
+                    <p className="text-gray-400 text-sm font-bold uppercase tracking-widest">{b.turf?.name} • {new Date(b.date).toLocaleDateString()} @ {formatTime(b.startTime)}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <span className="text-xl font-black text-gray-900 block mb-1">৳{b.totalPrice}</span>
+                  <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${b.status === 'confirmed' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                    {b.status}
+                  </span>
+                </div>
+              </div>
+            )) : (
+              <div className="p-24 text-center">
+                <Calendar className="mx-auto text-gray-200 mb-6" size={64} />
+                <h3 className="text-2xl font-black text-gray-900">No bookings yet</h3>
+                <p className="text-gray-400 font-medium">Your schedule is currently empty.</p>
               </div>
             )}
           </div>
-
-          {/* My Turfs */}
-          <div className="bg-white rounded-[40px] p-8 shadow-sm border border-gray-100">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">My Turfs</h2>
-            <div className="space-y-6">
-              {turfs.map(turf => (
-                <div key={turf._id} className="flex items-center gap-6 p-4 bg-gray-50 rounded-3xl">
-                  <div className="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0">
-                    <img src={turf.images[0]} alt={turf.name} className="w-full h-full object-cover" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-gray-900 truncate">{turf.name}</h4>
-                    <p className="text-xs text-gray-500 mb-2">{turf.location?.area}</p>
-                    <div className="flex gap-2">
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
-                        turf.status === 'approved' ? 'bg-green-100 text-green-600' : 
-                        turf.status === 'rejected' ? 'bg-red-100 text-red-600' : 'bg-yellow-100 text-yellow-600'
-                      }`}>
-                        {turf.status}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
+
+const StatCard = ({ icon: Icon, label, val, color, isPrimary }) => (
+  <div className={`${isPrimary ? 'bg-primary text-white shadow-primary/30' : 'bg-white text-gray-900'} p-10 rounded-[40px] shadow-2xl border border-gray-100 flex flex-col justify-between h-56`}>
+    <div className={`${isPrimary ? 'bg-white/20 text-white' : `bg-${color}-50 text-${color}-500`} w-14 h-14 rounded-2xl flex items-center justify-center`}>
+      <Icon size={24} />
+    </div>
+    <div>
+      <span className={`${isPrimary ? 'text-primary-light' : 'text-gray-400'} text-[10px] font-black uppercase tracking-widest block mb-1`}>{label}</span>
+      <span className="text-4xl font-black tracking-tighter">{val}</span>
+    </div>
+  </div>
+);
 
 export default OwnerDashboard;

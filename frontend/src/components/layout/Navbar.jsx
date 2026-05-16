@@ -17,39 +17,39 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white shadow-sm sticky top-0 z-50">
+    <nav className="bg-white/80 backdrop-blur-xl border-b border-gray-100 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+        <div className="flex justify-between h-20">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center">
-              <span className="text-2xl font-bold text-primary">Ledger<span className="text-gray-900">Turf</span></span>
+              <span className="text-3xl font-black text-gray-900 tracking-tighter">Ledger<span className="text-primary">Turf</span></span>
             </Link>
           </div>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link to="/turfs" className="text-gray-600 hover:text-primary transition">Find Turfs</Link>
+          <div className="hidden md:flex items-center space-x-10">
+            <Link to="/turfs" className="text-gray-500 hover:text-primary transition font-bold text-sm uppercase tracking-widest">Find Pitches</Link>
             {user ? (
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-6">
                 <Link 
                   to={user.role === 'superAdmin' ? '/dashboard/admin' : user.role === 'turfOwner' ? '/dashboard/owner' : '/dashboard/player'} 
-                  className="flex items-center text-gray-600 hover:text-primary transition"
+                  className="flex items-center bg-primary/10 text-primary px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-primary hover:text-white transition-all shadow-sm"
                 >
-                  <LayoutDashboard className="w-5 h-5 mr-1" />
+                  <LayoutDashboard className="w-4 h-4 mr-2" />
                   Dashboard
                 </Link>
                 <button 
                   onClick={onLogout}
-                  className="flex items-center text-gray-600 hover:text-red-500 transition"
+                  className="text-gray-400 hover:text-red-500 transition font-black text-xs uppercase tracking-widest flex items-center"
                 >
-                  <LogOut className="w-5 h-5 mr-1" />
-                  Logout
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
                 </button>
               </div>
             ) : (
-              <div className="flex items-center space-x-4">
-                <Link to="/login" className="text-gray-600 hover:text-primary transition font-medium">Login</Link>
-                <Link to="/register" className="bg-primary text-white px-5 py-2 rounded-lg hover:bg-primary-dark transition shadow-md">Join Now</Link>
+              <div className="flex items-center space-x-6">
+                <Link to="/login" className="text-gray-900 hover:text-primary transition font-black text-xs uppercase tracking-widest">Login</Link>
+                <Link to="/register/player" className="bg-gray-900 text-white px-8 py-3.5 rounded-2xl hover:bg-primary transition shadow-xl shadow-gray-200 font-black text-xs uppercase tracking-widest active:scale-95">Join Now</Link>
               </div>
             )}
           </div>
@@ -58,9 +58,9 @@ const Navbar = () => {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-600 hover:text-primary focus:outline-none"
+              className="text-gray-900 p-2 focus:outline-none"
             >
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
           </div>
         </div>
@@ -68,18 +68,18 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden bg-white border-t border-gray-100 pb-4">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link to="/turfs" className="block px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-md">Find Turfs</Link>
+        <div className="md:hidden bg-white border-t border-gray-100 animate-in slide-in-from-top duration-300">
+          <div className="px-6 pt-4 pb-10 space-y-4">
+            <Link to="/turfs" onClick={() => setIsOpen(false)} className="block py-4 text-gray-900 font-black text-xl border-b border-gray-50">Find Pitches</Link>
             {user ? (
               <>
-                <Link to="/dashboard" className="block px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-md">Dashboard</Link>
-                <button onClick={onLogout} className="w-full text-left px-3 py-2 text-red-500 hover:bg-gray-50 rounded-md">Logout</button>
+                <Link to="/dashboard" onClick={() => setIsOpen(false)} className="block py-4 text-primary font-black text-xl border-b border-gray-50">Dashboard</Link>
+                <button onClick={() => { onLogout(); setIsOpen(false); }} className="w-full text-left py-4 text-red-500 font-black text-xl">Sign Out</button>
               </>
             ) : (
               <>
-                <Link to="/login" className="block px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-md">Login</Link>
-                <Link to="/register" className="block px-3 py-2 text-primary font-medium">Register</Link>
+                <Link to="/login" onClick={() => setIsOpen(false)} className="block py-4 text-gray-900 font-black text-xl border-b border-gray-50">Login</Link>
+                <Link to="/register/player" onClick={() => setIsOpen(false)} className="block py-6 bg-primary text-white text-center rounded-3xl font-black text-2xl shadow-xl shadow-primary/20 mt-8">Join Now</Link>
               </>
             )}
           </div>

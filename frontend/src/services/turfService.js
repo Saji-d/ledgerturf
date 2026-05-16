@@ -20,7 +20,10 @@ const turfService = {
   },
 
   updateTurf: async (id, turfData) => {
-    const response = await api.put(`/turfs/${id}`, turfData);
+    const isFormData = turfData instanceof FormData;
+    const response = await api.put(`/turfs/${id}`, turfData, {
+      headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : {},
+    });
     return response.data;
   },
 

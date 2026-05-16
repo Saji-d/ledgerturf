@@ -55,10 +55,10 @@ const TurfListing = () => {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input 
                 type="text" 
-                placeholder="Search by area (e.g. Uttara, Mirpur)..."
-                className="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:ring-2 focus:ring-primary focus:bg-white transition outline-none"
-                onChange={(e) => updateFilters('area', e.target.value)}
-                value={searchParams.get('area') || ''}
+                placeholder="Search by area, name, or address..."
+                className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-gray-50 bg-gray-50 focus:ring-2 focus:ring-primary focus:bg-white transition outline-none font-bold"
+                onChange={(e) => updateFilters('search', e.target.value)}
+                value={searchParams.get('search') || ''}
               />
             </div>
             <div className="flex gap-2 w-full md:w-auto">
@@ -117,7 +117,7 @@ const TurfListing = () => {
                 <div className="flex-1">
                   <label className="block text-sm font-bold text-gray-900 mb-2">Time</label>
                   <select 
-                    className="w-full p-3 bg-gray-50 border border-transparent rounded-xl focus:ring-2 focus:ring-primary transition"
+                    className="w-full p-3 bg-gray-50 border-2 border-gray-50 rounded-xl focus:ring-2 focus:ring-primary focus:bg-white transition font-bold outline-none"
                     onChange={(e) => {
                       updateFilters('startTime', e.target.value);
                       const [h, m] = e.target.value.split(':').map(Number);
@@ -126,7 +126,14 @@ const TurfListing = () => {
                     value={searchParams.get('startTime') || ''}
                   >
                     <option value="">Any Time</option>
-                    {["06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00"].map(t => <option key={t} value={t}>{t}</option>)}
+                    {[
+                      { v: "06:00", l: "06:00 AM" }, { v: "07:00", l: "07:00 AM" }, { v: "08:00", l: "08:00 AM" },
+                      { v: "09:00", l: "09:00 AM" }, { v: "10:00", l: "10:00 AM" }, { v: "11:00", l: "11:00 AM" },
+                      { v: "12:00", l: "12:00 PM" }, { v: "13:00", l: "01:00 PM" }, { v: "14:00", l: "02:00 PM" },
+                      { v: "15:00", l: "03:00 PM" }, { v: "16:00", l: "04:00 PM" }, { v: "17:00", l: "05:00 PM" },
+                      { v: "18:00", l: "06:00 PM" }, { v: "19:00", l: "07:00 PM" }, { v: "20:00", l: "08:00 PM" },
+                      { v: "21:00", l: "09:00 PM" }, { v: "22:00", l: "10:00 PM" }
+                    ].map(t => <option key={t.v} value={t.v}>{t.l}</option>)}
                   </select>
                 </div>
                 <button onClick={clearFilters} className="text-sm font-bold text-red-500 hover:underline flex items-center mb-3">

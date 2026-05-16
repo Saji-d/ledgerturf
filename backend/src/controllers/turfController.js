@@ -14,10 +14,23 @@ exports.getTurfs = asyncHandler(async (req, res, next) => {
   queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, (match) => `$${match}`);
   let baseQuery = JSON.parse(queryStr);
 
-  // Improved Area Search (Fuzzy/Regex)
+  // Improved Area and Name Search (Fuzzy/Regex)
   if (req.query.area) {
     baseQuery['location.area'] = { $regex: req.query.area, $options: 'i' };
-    delete baseQuery.area;
+  }
+  
+  if (req.query.name) {
+    baseQuery.name = { $regex: req.query.name, $options: 'i' };
+  }
+
+  // Support for general 'search' term across area and name
+  if (req.query.search) {
+    const searchRegex = { $regex: req.query.search, $options: 'i' };
+    baseQuery.$or = [
+      { name: searchRegex },
+      { 'location.area': searchRegex },
+      { address: searchRegex }
+    ];
   }
 
   // Role-based visibility
@@ -44,7 +57,8 @@ exports.getTurfs = asyncHandler(async (req, res, next) => {
   // Availability Filtering
   if (req.query.date && req.query.startTime && req.query.endTime) {
     const Booking = require('../models/Booking');
-    const bookedTurfs = await Booking.find({
+    // Find turfs that ARE booked in this slot
+    const overlappingBookings = await Booking.find({
       date: new Date(req.query.date),
       status: { $in: [BOOKING_STATUS.PENDING, BOOKING_STATUS.CONFIRMED] },
       $or: [
@@ -53,7 +67,8 @@ exports.getTurfs = asyncHandler(async (req, res, next) => {
       ]
     }).distinct('turf');
     
-    baseQuery._id = { $nin: bookedTurfs };
+    // Exclude those turfs
+    baseQuery._id = { $nin: overlappingBookings };
   }
 
   let query = Turf.find(baseQuery).populate('owner', 'name email phone');
@@ -74,7 +89,7 @@ exports.getTurfs = asyncHandler(async (req, res, next) => {
 
   // Pagination
   const page = parseInt(req.query.page, 10) || 1;
-  const limit = parseInt(req.query.limit, 10) || 10;
+  const limit = parseInt(req.query.limit, 10) || 20; // Increased for better discovery
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
   const total = await Turf.countDocuments(baseQuery);
