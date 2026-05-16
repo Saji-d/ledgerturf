@@ -64,34 +64,37 @@ app.use(errorMiddleware);
 // =========================
 const PORT = process.env.PORT || 5002;
 
-const server = app.listen(PORT, () => {
-  console.log(
-    `Server running in ${
-      process.env.NODE_ENV || 'development'
-    } mode on port ${PORT}`
-  );
-});
-
-// =========================
-// Graceful Shutdown
-// =========================
-const gracefulShutdown = (signal) => {
-  console.log(`\n${signal} received. Shutting down gracefully...`);
-
-  server.close(() => {
-    console.log('HTTP server closed.');
-    process.exit(0);
+// Only start the server locally. Vercel will use the exported app directly.
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+  const server = app.listen(PORT, () => {
+    console.log(
+      `Server running in ${
+        process.env.NODE_ENV || 'development'
+      } mode on port ${PORT}`
+    );
   });
 
-  // Force shutdown after 10 seconds
-  setTimeout(() => {
-    console.error('Forcefully shutting down...');
-    process.exit(1);
-  }, 10000);
-};
+  // =========================
+  // Graceful Shutdown
+  // =========================
+  const gracefulShutdown = (signal) => {
+    console.log(`\n${signal} received. Shutting down gracefully...`);
 
-process.on('SIGINT', () => gracefulShutdown('SIGINT'));
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+    server.close(() => {
+      console.log('HTTP server closed.');
+      process.exit(0);
+    });
+
+    // Force shutdown after 10 seconds
+    setTimeout(() => {
+      console.error('Forcefully shutting down...');
+      process.exit(1);
+    }, 10000);
+  };
+
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+}
 
 // =========================
 // Handle Uncaught Errors
@@ -103,3 +106,6 @@ process.on('uncaughtException', (err) => {
 process.on('unhandledRejection', (err) => {
   console.error('UNHANDLED REJECTION:', err);
 });
+
+// Export the app for Vercel Serverless Functions
+module.exports = app;
