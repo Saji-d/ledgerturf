@@ -12,7 +12,7 @@ const TurfListing = () => {
   const [turfs, setTurfs] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [showFilters, setShowFilters] = React.useState(false);
-  const [viewMode, setViewMode] = React.useState('list');
+  const [viewMode, setViewMode] = React.useState(searchParams.get('view') === 'map' ? 'map' : 'list');
 
   const fetchTurfs = async () => {
     setLoading(true);
@@ -52,7 +52,8 @@ const TurfListing = () => {
     setSearchParams(new URLSearchParams());
   };
 
-  const currentSearchValue = searchParams.get('search') || searchParams.get('area') || '';
+  const currentSearchValue = searchParams.get('search') || '';
+  const currentArea = searchParams.get('area') || '';
 
   return (
     <div className="bg-gray-50 min-h-screen pb-20">
@@ -63,12 +64,21 @@ const TurfListing = () => {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input 
                 type="text" 
-                placeholder="Search by area, name, or address..."
+                placeholder="Search by name or address..."
                 className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-gray-50 bg-gray-50 focus:ring-2 focus:ring-primary focus:bg-white transition outline-none font-bold"
                 onChange={(e) => updateFilters('search', e.target.value)}
                 value={currentSearchValue}
               />
             </div>
+            {currentArea && (
+              <div className="bg-primary/10 border border-primary/20 px-6 py-4 rounded-2xl flex items-center gap-3 animate-in zoom-in-95">
+                <MapPin className="text-primary w-5 h-5" />
+                <span className="font-black text-primary text-sm uppercase tracking-widest">{currentArea}</span>
+                <button onClick={() => updateFilters('area', '')} className="text-primary hover:text-primary-dark p-1">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
             <div className="flex gap-2 w-full md:w-auto">
               <button 
                 onClick={() => {

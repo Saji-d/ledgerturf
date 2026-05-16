@@ -44,6 +44,9 @@ function App() {
             <Route path="/dashboard/player" element={<UserDashboard />} />
             <Route path="/dashboard/owner" element={<OwnerDashboard />} />
             <Route path="/dashboard/admin" element={<AdminDashboard />} />
+            <Route path="/dashboard/admin/players" element={<AdminDashboard />} />
+            <Route path="/dashboard/admin/owners" element={<AdminDashboard />} />
+            <Route path="/dashboard/admin/stats" element={<AdminDashboard />} />
           </Route>
         </Route>
 

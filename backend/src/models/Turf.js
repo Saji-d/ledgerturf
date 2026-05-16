@@ -73,6 +73,9 @@ const turfSchema = new mongoose.Schema(
       max: [5, 'Rating cannot be more than 5'],
       default: 0,
     },
+    mapLink: {
+      type: String,
+    },
   },
   {
     timestamps: true,

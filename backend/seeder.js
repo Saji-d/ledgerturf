@@ -11,7 +11,6 @@ dotenv.config();
 mongoose.connect(process.env.MONGO_URI);
 
 const turfsData = [
-  // Uttara
   {
     name: 'Uttara Arena Football Club',
     area: 'Uttara',
@@ -20,7 +19,7 @@ const turfsData = [
     price: 2500,
     rating: 4.8,
     img: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?auto=format&fit=crop&q=80&w=800',
-    desc: 'Floodlight equipped premium football turf in Uttara Sector 1. Best for night matches.'
+    desc: 'Floodlight equipped premium football turf in Uttara Sector 1.'
   },
   {
     name: 'Sector 4 Indoor Cricket Hub',
@@ -30,7 +29,7 @@ const turfsData = [
     price: 3500,
     rating: 4.5,
     img: 'https://images.unsplash.com/photo-1531415080293-2f768a3d59cd?auto=format&fit=crop&q=80&w=800',
-    desc: 'Professional indoor cricket facility with bowling machines and expert coaching.'
+    desc: 'Professional indoor cricket facility in Uttara Sector 4.'
   },
   {
     name: 'Uttara High Noon Multi-Sport',
@@ -40,9 +39,8 @@ const turfsData = [
     price: 3000,
     rating: 4.2,
     img: 'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?auto=format&fit=crop&q=80&w=800',
-    desc: 'High-quality multi-purpose turf suitable for both football and cricket enthusiasts.'
+    desc: 'Versatile multi-purpose turf for community matches in Uttara.'
   },
-  // Mirpur
   {
     name: 'Mirpur DOHS Sports City',
     area: 'Mirpur',
@@ -51,7 +49,7 @@ const turfsData = [
     price: 2200,
     rating: 4.7,
     img: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=800',
-    desc: 'Located in the secure DOHS area, offering top-tier artificial grass for 7-a-side matches.'
+    desc: 'Secure and high-quality football turf located in Mirpur DOHS.'
   },
   {
     name: 'Elite Cricket Academy Mirpur',
@@ -61,7 +59,7 @@ const turfsData = [
     price: 4000,
     rating: 4.9,
     img: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&q=80&w=800',
-    desc: 'Premium cricket academy and turf with floodlights and international standard pitches.'
+    desc: 'International standard cricket facility in the heart of Mirpur.'
   },
   {
     name: 'Mirpur Stadium Rooftop Turf',
@@ -71,9 +69,8 @@ const turfsData = [
     price: 2800,
     rating: 4.6,
     img: 'https://images.unsplash.com/photo-1510566337590-2fc1f21d0faa?auto=format&fit=crop&q=80&w=800',
-    desc: 'Unique rooftop experience with a view of the national stadium. Perfect for social games.'
+    desc: 'Stunning rooftop football experience overlooking Mirpur Stadium.'
   },
-  // Dhanmondi
   {
     name: 'Dhanmondi Club Turf',
     area: 'Dhanmondi',
@@ -82,7 +79,7 @@ const turfsData = [
     price: 3200,
     rating: 4.6,
     img: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?auto=format&fit=crop&q=80&w=800',
-    desc: 'Iconic Dhanmondi club turf with a rich history and well-maintained grass surface.'
+    desc: 'Historic club turf with premium grass in Dhanmondi.'
   },
   {
     name: 'Abahani Field Premium Cricket',
@@ -92,9 +89,8 @@ const turfsData = [
     price: 4500,
     rating: 4.8,
     img: 'https://images.unsplash.com/photo-1593341646782-e0b495cff86d?auto=format&fit=crop&q=80&w=800',
-    desc: 'Top-of-the-line cricket turf in Dhanmondi. Home to some of the best matches in the city.'
+    desc: 'The gold standard for cricket enthusiasts in Dhanmondi.'
   },
-  // Gulshan
   {
     name: 'Gulshan Youth Club Grounds',
     area: 'Gulshan',
@@ -103,7 +99,7 @@ const turfsData = [
     price: 4000,
     rating: 4.9,
     img: 'https://images.unsplash.com/photo-1518605336324-4829759e663e?auto=format&fit=crop&q=80&w=800',
-    desc: 'Premium multi-sport facility in Gulshan 2. Highly sought after for its prime location.'
+    desc: 'Prime multi-sport facility in the elite Gulshan 2 area.'
   },
   {
     name: 'Niketon Sport Zone',
@@ -113,9 +109,8 @@ const turfsData = [
     price: 3500,
     rating: 4.4,
     img: 'https://images.unsplash.com/photo-1556056504-5c7696c4c28d?auto=format&fit=crop&q=80&w=800',
-    desc: 'Modern football turf in Niketon. Excellent floodlighting for night-time matches.'
+    desc: 'Modern football arena in Niketon with excellent amenities.'
   },
-  // Banani
   {
     name: 'Banani Field 11',
     area: 'Banani',
@@ -124,28 +119,27 @@ const turfsData = [
     price: 3800,
     rating: 4.7,
     img: 'https://images.unsplash.com/photo-1526232761682-d26e03ac148e?auto=format&fit=crop&q=80&w=800',
-    desc: 'Premium artificial grass turf in Banani 11. Known for its perfect surface and lighting.'
+    desc: 'Top-tier artificial grass turf in Banani Road 11.'
   },
   {
-    name: 'Chairman Bari Indoor Cricket Center',
+    name: 'Chairman Bari Indoor Cricket',
     area: 'Banani',
     coords: [90.4000, 23.7880],
     sports: ['Cricket'],
     price: 4200,
     rating: 4.3,
     img: 'https://images.unsplash.com/photo-1606913084603-3e75a3399432?auto=format&fit=crop&q=80&w=800',
-    desc: 'Premier indoor cricket center with high-performance nets and bowling machines.'
+    desc: 'Elite indoor cricket training center in Banani.'
   },
-  // Bashundhara
   {
-    name: 'Bashundhara Kings Sports Complex',
+    name: 'Bashundhara Kings Complex',
     area: 'Bashundhara',
     coords: [90.4550, 23.8180],
     sports: ['Football', 'Cricket'],
     price: 5000,
     rating: 4.9,
     img: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&q=80&w=800',
-    desc: 'State-of-the-art sports complex in Bashundhara. The most premium turf in Bangladesh.'
+    desc: 'State-of-the-art sports complex in Bashundhara R/A.'
   },
   {
     name: 'P Block Mini Football Turf',
@@ -155,9 +149,8 @@ const turfsData = [
     price: 2000,
     rating: 4.1,
     img: 'https://images.unsplash.com/photo-1431324155629-1a6eda1eed2d?auto=format&fit=crop&q=80&w=800',
-    desc: 'Affordable mini-turf in Bashundhara P block. Great for kids and casual 5-a-side matches.'
+    desc: 'Perfect for casual 5-a-side matches in Bashundhara Block P.'
   },
-  // Badda
   {
     name: 'Badda Al-Amin Sports Club',
     area: 'Badda',
@@ -166,7 +159,7 @@ const turfsData = [
     price: 1800,
     rating: 4.2,
     img: 'https://images.unsplash.com/photo-1551244072-5d12893278ab?auto=format&fit=crop&q=80&w=800',
-    desc: 'Friendly community sports club with a solid football turf and local vibes.'
+    desc: 'Affordable and well-maintained football turf in Badda.'
   },
   {
     name: 'Satarkul Cricket Hub',
@@ -176,9 +169,8 @@ const turfsData = [
     price: 2500,
     rating: 4.4,
     img: 'https://images.unsplash.com/photo-1589801258277-50e42706a298?auto=format&fit=crop&q=80&w=800',
-    desc: 'Dedicated cricket hub in Satarkul with multiple practice nets and a main turf.'
+    desc: 'Dedicated cricket hub with practice nets in Satarkul, Badda.'
   },
-  // Khilkhet
   {
     name: 'Khilkhet United Grounds',
     area: 'Khilkhet',
@@ -187,7 +179,7 @@ const turfsData = [
     price: 1900,
     rating: 4.5,
     img: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?auto=format&fit=crop&q=80&w=800',
-    desc: 'Well-maintained football grounds in Khilkhet, offering good value for money.'
+    desc: 'Vibrant football ground for local teams in Khilkhet.'
   },
   {
     name: 'Nikunja Rooftop Sports',
@@ -197,9 +189,8 @@ const turfsData = [
     price: 2400,
     rating: 4.6,
     img: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&q=80&w=800',
-    desc: 'A trendy rooftop turf in Nikunja with a cool breeze and great city view.'
+    desc: 'Enjoy night football with a breeze on this Nikunja rooftop.'
   },
-  // Mohammadpur
   {
     name: 'Mohammadpur Physical Arena',
     area: 'Mohammadpur',
@@ -208,7 +199,7 @@ const turfsData = [
     price: 2100,
     rating: 4.7,
     img: 'https://images.unsplash.com/photo-1524015324113-ad97d9937265?auto=format&fit=crop&q=80&w=800',
-    desc: 'Large football arena in Mohammadpur with high-quality artificial grass.'
+    desc: 'Spacious football arena with international grade artificial grass.'
   },
   {
     name: 'Asad Gate Sports Zone',
@@ -218,18 +209,17 @@ const turfsData = [
     price: 2800,
     rating: 4.4,
     img: 'https://images.unsplash.com/photo-1587385789097-724d207ec224?auto=format&fit=crop&q=80&w=800',
-    desc: 'Conveniently located sports zone near Asad Gate with a solid cricket turf.'
+    desc: 'Centrally located cricket facility near Asad Gate.'
   },
-  // Rampura
   {
-    name: 'Rampura Banasree Block F Turf',
+    name: 'Banasree Block F Turf',
     area: 'Rampura',
     coords: [90.4350, 23.7650],
     sports: ['Football'],
     price: 1850,
     rating: 4.1,
     img: 'https://images.unsplash.com/photo-1563820250230-019912768565?auto=format&fit=crop&q=80&w=800',
-    desc: 'A popular football turf in Banasree, known for its friendly environment.'
+    desc: 'Popular local football turf in Banasree Block F.'
   },
   {
     name: 'Aftabnagar Grand Arena',
@@ -239,7 +229,7 @@ const turfsData = [
     price: 3200,
     rating: 4.8,
     img: 'https://images.unsplash.com/photo-1526232761682-d26e03ac148e?auto=format&fit=crop&q=80&w=800',
-    desc: 'Spacious and well-lit arena in Aftabnagar for both football and cricket.'
+    desc: 'Spacious and floodlit multi-sport arena in Aftabnagar.'
   }
 ];
 
@@ -250,8 +240,7 @@ const seedData = async () => {
     await Booking.deleteMany();
     await Review.deleteMany();
 
-    // Create SuperAdmin
-    await User.create({
+    const admin = await User.create({
       name: 'Super Admin',
       email: 'admin@ledgerturf.com',
       password: 'password123',
@@ -259,7 +248,6 @@ const seedData = async () => {
       role: USER_ROLES.SUPER_ADMIN,
     });
 
-    // Create 3 Owners
     const owners = [];
     const ownerNames = ['Rahat Ahmed', 'Salim Khan', 'Nafis Iqbal'];
     for (let i = 0; i < 3; i++) {
@@ -273,14 +261,12 @@ const seedData = async () => {
       owners.push(owner);
     }
 
-    // Create Turfs
-    const turfs = [];
     for (let i = 0; i < turfsData.length; i++) {
       const d = turfsData[i];
       const turf = await Turf.create({
         owner: owners[i % owners.length]._id,
         name: d.name,
-        description: d.desc || `Premium ${d.sports.join(' and ')} facility located in the heart of ${d.area}. We provide high-quality grass, excellent lighting for night matches, and clean changing rooms. Perfect for corporate matches and friendly games.`,
+        description: d.desc,
         address: `${d.area}, Dhaka, Bangladesh`,
         location: {
           type: 'Point',
@@ -291,25 +277,23 @@ const seedData = async () => {
         sportTypes: d.sports,
         pricePerHour: d.price,
         status: TURF_STATUS.APPROVED,
-        isIndoor: d.name.toLowerCase().includes('indoor') || Math.random() > 0.8,
+        isIndoor: d.name.toLowerCase().includes('indoor'),
         averageRating: d.rating,
         openingTime: '06:00',
         closingTime: '23:00',
-        images: [d.img]
+        images: [d.img],
+        mapLink: `https://www.google.com/maps/search/?api=1&query=${d.coords[1]},${d.coords[0]}`
       });
-      turfs.push(turf);
 
-      // Add a dummy review to make the rating realistic
       await Review.create({
-        user: (await User.findOne({role: USER_ROLES.SUPER_ADMIN}))._id,
+        user: admin._id,
         turf: turf._id,
         rating: Math.floor(d.rating),
-        comment: 'Excellent facility and well maintained field.'
+        comment: 'Verified facility with excellent maintenance.'
       });
     }
 
-    // Create a Test Player
-    const player = await User.create({
+    await User.create({
       name: 'Tamim Iqbal',
       email: 'player@gmail.com',
       password: 'password123',
@@ -317,10 +301,10 @@ const seedData = async () => {
       role: USER_ROLES.PLAYER,
     });
 
-    console.log(`Database seeded with 1 Admin, 3 Owners, ${turfs.length} Turfs, and 1 Player.`);
+    console.log(`Reseeded: 1 Admin, 3 Owners, ${turfsData.length} Turfs with verified coordinates and unique images.`);
     process.exit();
   } catch (error) {
-    console.error('Error seeding data:', error);
+    console.error('Seeding failed:', error);
     process.exit(1);
   }
 };

@@ -19,6 +19,7 @@ const TurfDetails = () => {
 
   const [turf, setTurf] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
+  const [imgSrc, setImgSrc] = React.useState('');
   const [selectedDate, setSelectedDate] = React.useState(new Date());
   const [unavailableSlots, setUnavailableSlots] = React.useState([]);
   const [selectedSlot, setSelectedSlot] = React.useState(null);
@@ -44,6 +45,7 @@ const TurfDetails = () => {
       console.log('Turf details API Response:', res);
       if (res.success) {
         setTurf(res.data);
+        setImgSrc(res.data.images?.[0] || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=1200');
       }
     } catch (error) {
       console.error('Error fetching turf details:', error);
@@ -51,6 +53,20 @@ const TurfDetails = () => {
       navigate('/turfs');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleImageError = () => {
+    setImgSrc('https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=1200');
+  };
+
+  const openDirections = (e) => {
+    e.preventDefault();
+    if (turf.mapLink) {
+      window.open(turf.mapLink, '_blank');
+    } else {
+      const [lng, lat] = turf.location.coordinates;
+      window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank');
     }
   };
 
@@ -153,8 +169,9 @@ const TurfDetails = () => {
             <div className="bg-white rounded-[64px] overflow-hidden shadow-2xl border border-gray-100">
               <div className="aspect-[21/9] relative">
                 <img 
-                  src={turf.images?.[0] || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=1200'} 
+                  src={imgSrc} 
                   alt={turf.name}
+                  onError={handleImageError}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute top-8 left-8 flex gap-4">
@@ -212,14 +229,12 @@ const TurfDetails = () => {
                 <div className="space-y-6 pt-12 border-t border-gray-50">
                   <div className="flex justify-between items-end">
                     <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter">Location & Directions</h3>
-                    <a 
-                      href={`https://www.google.com/maps/dir/?api=1&destination=${turf.location?.coordinates?.[1]},${turf.location?.coordinates?.[0]}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button 
+                      onClick={openDirections}
                       className="text-primary font-black text-sm hover:underline flex items-center gap-2"
                     >
                       Get Directions <ArrowRight size={16} />
-                    </a>
+                    </button>
                   </div>
                   <div className="h-96 rounded-[48px] overflow-hidden border-4 border-gray-50 shadow-inner bg-gray-100">
                     <MapComponent turfs={[turf]} />
@@ -337,27 +352,41 @@ const TurfDetails = () => {
                     <label className="block text-sm font-black text-gray-700 uppercase tracking-widest flex items-center gap-2">
                       <Clock className="text-primary w-4 h-4" /> Select Slot
                     </label>
-                    <div className="grid grid-cols-3 gap-3">
-                      {timeSlots.map(slot => {
-                        const isBooked = unavailableSlots.includes(slot.v);
-                        const isSelected = selectedSlot === slot.v;
-                        return (
-                          <button
-                            key={slot.v}
-                            disabled={isBooked}
-                            onClick={() => setSelectedSlot(slot.v)}
-                            className={`py-4 rounded-2xl text-xs font-black transition-all border-2 ${
-                              isBooked 
-                                ? 'bg-gray-100 text-gray-200 border-transparent cursor-not-allowed opacity-50' 
-                                : isSelected 
-                                  ? 'bg-primary text-white border-primary shadow-xl shadow-primary/20' 
-                                  : 'bg-white text-gray-600 border-gray-100 hover:border-primary/50'
-                            }`}
-                          >
-                            {slot.l}
-                          </button>
-                        );
-                      })}
+                    <div className="max-h-[320px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent hover:scrollbar-thumb-primary/20 transition-colors">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {timeSlots.map(slot => {
+                          const isBooked = unavailableSlots.includes(slot.v);
+                          
+                          // Check if slot has already passed for today (BD Time UTC+6)
+                          const now = new Date();
+                          const bdTime = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (6 * 3600000));
+                          const isToday = selectedDate.toDateString() === bdTime.toDateString();
+                          const [slotH, slotM] = slot.v.split(':').map(Number);
+                          const isPast = isToday && (slotH < bdTime.getHours() || (slotH === bdTime.getHours() && slotM <= bdTime.getMinutes()));
+                          
+                          const isDisabled = isBooked || isPast;
+                          const isSelected = selectedSlot === slot.v;
+
+                          return (
+                            <button
+                              key={slot.v}
+                              disabled={isDisabled}
+                              onClick={() => !isDisabled && setSelectedSlot(slot.v)}
+                              className={`py-4 rounded-2xl text-[10px] font-black transition-all border-2 uppercase tracking-tighter ${
+                                isDisabled 
+                                  ? 'bg-red-50 text-red-300 border-red-100 cursor-not-allowed opacity-60' 
+                                  : isSelected 
+                                    ? 'bg-primary text-white border-primary shadow-xl shadow-primary/20' 
+                                    : 'bg-white text-gray-600 border-gray-100 hover:border-primary/50'
+                              }`}
+                            >
+                              {slot.l}
+                              {isBooked && <span className="block text-[8px] mt-1 text-red-400">Booked</span>}
+                              {isPast && <span className="block text-[8px] mt-1 text-red-400">Passed</span>}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
 

@@ -4,12 +4,29 @@ import { MapPin, Trophy, Users, Star, Clock } from 'lucide-react';
 import { formatTime } from '@/utils/formatters';
 
 const TurfCard = ({ turf }) => {
+  const [imgSrc, setImgSrc] = React.useState(turf.images?.[0] || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=800');
+
+  const handleImageError = () => {
+    setImgSrc('https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=800');
+  };
+
+  const openMap = (e) => {
+    e.preventDefault();
+    if (turf.mapLink) {
+      window.open(turf.mapLink, '_blank');
+    } else {
+      const [lng, lat] = turf.location.coordinates;
+      window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, '_blank');
+    }
+  };
+
   return (
     <div className="bg-white rounded-[40px] overflow-hidden border border-gray-100 shadow-sm hover:shadow-2xl transition-all duration-500 group relative">
       <div className="relative h-64 overflow-hidden">
         <img 
-          src={turf.images?.[0] || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=800'} 
+          src={imgSrc} 
           alt={turf.name}
+          onError={handleImageError}
           className="w-full h-full object-cover group-hover:scale-110 transition duration-700"
         />
         <div className="absolute top-6 left-6 bg-white/90 backdrop-blur px-4 py-2 rounded-2xl text-xs font-black text-gray-900 shadow-xl flex items-center gap-2">
@@ -47,10 +64,7 @@ const TurfCard = ({ turf }) => {
           </div>
           <div className="flex gap-2">
             <button 
-              onClick={(e) => {
-                e.preventDefault();
-                window.open(`https://www.google.com/maps/search/?api=1&query=${turf.location.coordinates[1]},${turf.location.coordinates[0]}`, '_blank');
-              }}
+              onClick={openMap}
               className="p-3 bg-gray-50 text-gray-400 rounded-2xl hover:bg-primary/10 hover:text-primary transition"
               title="View on Map"
             >

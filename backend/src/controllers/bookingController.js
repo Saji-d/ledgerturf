@@ -37,7 +37,36 @@ exports.getBookings = asyncHandler(async (req, res, next) => {
 exports.createBooking = asyncHandler(async (req, res, next) => {
   const { turf: turfId, date, startTime, endTime } = req.body;
 
-  // 1. Check if turf exists and is approved
+  // 1. Basic time validation
+  const now = new Date();
+  const bdTime = new Date(now.getTime() + (6 * 60 * 60 * 1000)); // Current time in BD
+  const bookingDate = new Date(date);
+  
+  // Set times to 00:00:00 for date-only comparison
+  const todayBD = new Date(bdTime.getFullYear(), bdTime.getMonth(), bdTime.getDate());
+  const selectedDate = new Date(bookingDate.getFullYear(), bookingDate.getMonth(), bookingDate.getDate());
+
+  if (selectedDate < todayBD) {
+    res.status(400);
+    throw new Error('Cannot book for a past date');
+  }
+
+  if (selectedDate.getTime() === todayBD.getTime()) {
+    const [nowH, nowM] = [bdTime.getUTCHours(), bdTime.getUTCMinutes()];
+    const [startH, startM] = startTime.split(':').map(Number);
+    
+    if (startH < nowH || (startH === nowH && startM <= nowM)) {
+      res.status(400);
+      throw new Error('Cannot book for a past time slot');
+    }
+  }
+
+  if (startTime >= endTime) {
+    res.status(400);
+    throw new Error('Start time must be before end time');
+  }
+
+  // 2. Check if turf exists and is approved
   const turf = await Turf.findById(turfId);
   if (!turf || turf.status !== 'approved') {
     res.status(404);

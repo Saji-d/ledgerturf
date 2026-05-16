@@ -39,14 +39,14 @@ const Home = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen overflow-x-hidden">
+    <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-gray-900 h-[calc(100vh-64px)] min-h-[600px] max-h-[900px] flex items-center overflow-hidden">
+      <section className="relative bg-gray-900 h-[calc(100vh-80px)] min-h-[600px] flex items-center overflow-hidden">
         <div className="absolute inset-0 z-0 opacity-60">
           <img 
             src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=2000" 
             alt="Football turf" 
-            className="w-full h-full object-cover scale-105"
+            className="w-full h-full object-cover"
           />
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
@@ -114,7 +114,7 @@ const Home = () => {
       </section>
 
       {/* Role Selection Section */}
-          <section className="py-24 bg-white relative -mt-16 z-20">
+      <section className="py-24 bg-white relative z-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <motion.div 
@@ -156,27 +156,27 @@ const Home = () => {
             <h2 className="text-5xl font-black text-gray-900 leading-tight">Explore Areas</h2>
             <p className="text-gray-500 mt-4 text-xl font-medium">The closest turfs in your neighborhood.</p>
           </div>
-          <Link to="/turfs" className="bg-white px-8 py-4 rounded-2xl text-primary font-black flex items-center shadow-sm hover:shadow-md transition">
+          <Link to="/turfs?view=map" className="bg-white px-8 py-4 rounded-2xl text-primary font-black flex items-center shadow-sm hover:shadow-md transition">
             View Map <MapPin className="ml-2 w-5 h-5" />
           </Link>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {['Uttara', 'Mirpur', 'Banani', 'Gulshan', 'Dhanmondi', 'Bashundhara', 'Badda', 'Khilkhet'].map((area, idx) => (
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+            {['Uttara', 'Mirpur', 'Banani', 'Gulshan', 'Dhanmondi', 'Bashundhara', 'Badda', 'Khilkhet', 'Mohammadpur', 'Rampura'].map((area, idx) => (
               <motion.div
                 key={area}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.05 }}
               >
                 <Link 
                   to={`/turfs?area=${area}`}
-                  className="bg-white p-10 rounded-[40px] text-center shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 border border-gray-100 block group"
+                  className="bg-white p-8 rounded-[32px] text-center shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 border border-gray-50 block group h-full flex flex-col items-center justify-center"
                 >
-                  <div className="bg-gray-50 w-20 h-20 rounded-[24px] flex items-center justify-center mx-auto mb-8 group-hover:bg-primary group-hover:rotate-12 transition-all duration-500">
-                    <MapPin className="w-10 h-10 text-gray-400 group-hover:text-white transition" />
+                  <div className="bg-primary/5 w-16 h-16 rounded-[20px] flex items-center justify-center mb-6 group-hover:bg-primary group-hover:rotate-12 transition-all duration-500">
+                    <MapPin className="w-8 h-8 text-primary group-hover:text-white transition" />
                   </div>
-                  <span className="font-black text-2xl text-gray-800">{area}</span>
+                  <span className="font-black text-xl text-gray-800 group-hover:text-primary transition">{area}</span>
                 </Link>
               </motion.div>
             ))}
