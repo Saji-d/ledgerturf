@@ -70,15 +70,19 @@ exports.getTurfs = asyncHandler(async (req, res, next) => {
   }
 
   // GeoJSON Spatial search
-  if (req.query.lat && req.query.lng) {
-    const lat = parseFloat(req.query.lat);
-    const lng = parseFloat(req.query.lng);
-    const distance = parseFloat(req.query.distance) || 10;
-    const radius = distance / 6378.1;
-    baseQuery.location = {
-      $geoWithin: { $centerSphere: [[lng, lat], radius] },
-    };
-  }
+// Geo search disabled temporarily for Vercel stability
+/*
+if (req.query.lat && req.query.lng) {
+  const lat = parseFloat(req.query.lat);
+  const lng = parseFloat(req.query.lng);
+  const distance = parseFloat(req.query.distance) || 10;
+  const radius = distance / 6378.1;
+
+  baseQuery.location = {
+    $geoWithin: { $centerSphere: [[lng, lat], radius] },
+  };
+}
+*/
 
   // Availability Filtering
   if (req.query.date && req.query.startTime && req.query.endTime) {
@@ -97,7 +101,13 @@ exports.getTurfs = asyncHandler(async (req, res, next) => {
     baseQuery._id = { $nin: overlappingBookings };
   }
 
-  let query = Turf.find(baseQuery).populate('owner', 'name email phone');
+  let query = Turf.find(baseQuery);
+
+try {
+  query = query.populate('owner', 'name email phone');
+} catch (err) {
+  console.log('Populate failed:', err.message);
+}
 
   // Select Fields
   if (req.query.select) {
