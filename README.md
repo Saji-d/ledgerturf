@@ -1,7 +1,7 @@
 <div align="center">
   <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=200" alt="LedgerTurf Logo" width="120" style="border-radius: 20px; margin-bottom: 20px;" />
   
-  <h1>🏟️ LedgerTurf</h1>
+  <h1>LedgerTurf</h1>
   
   <p><strong>Dhaka's Premier MERN-Stack Turf Booking Ecosystem</strong></p>
 
@@ -18,8 +18,6 @@
     <img src="https://img.shields.io/badge/Express-000000?style=flat-square&logo=express&logoColor=white" alt="Express" />
     <img src="https://img.shields.io/badge/MongoDB-47A248?style=flat-square&logo=mongodb&logoColor=white" alt="MongoDB" />
   </p>
-
-  <br />
 
   <p>
     <a href="#-overview">Overview</a> •
@@ -174,15 +172,25 @@ LedgerTurf is actively deployed and optimized for **Vercel**.
 
 ---
 
-## 👥 Contributors
 
-* **Sajidur Rahman Sajid** - *Lead Engineer & Architect* - [GitHub](https://github.com/Saji-d)
+## 🌟 Project Highlights
+
+- Production-ready MERN architecture optimized for scalability
+- Real-time slot booking with concurrency-safe validation
+- Geo-spatial venue discovery powered by MongoDB indexing
+- Role-based dashboards for Players, Owners, and Admins
+- Fully deployed full-stack platform on Vercel
+- Modern responsive UI with smooth micro-interactions
 
 ---
 
-## 📄 License
+## 🤝 Contribution & Feedback
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Contributions, feature suggestions, and constructive feedback are always welcome.
+
+If you found this project interesting, consider giving it a ⭐ on GitHub.
+
+---
 
 <div align="center">
   <p>Engineered with precision for Dhaka's vibrant sports community.</p>
