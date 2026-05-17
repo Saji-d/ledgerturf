@@ -16,8 +16,10 @@ const NightTurfs = () => {
       // Fetch all and filter specifically for the 3 midnight turfs by name 
       // or by closing time logic that we know includes them (06:00 AM)
       const res = await turfService.getTurfs({ limit: 100 });
+      console.log('GET /api/turfs response (NightTurfs):', res);
       if (res && res.success) {
-        const filtered = res.data.filter(t => 
+        const data = Array.isArray(res.data) ? res.data : [];
+        const filtered = data.filter(t => 
           t.closingTime === '06:00' || 
           ['Midnight Arena Dhaka', 'Night Owl Futsal Zone', 'Floodlight Football Hub'].includes(t.name)
         );

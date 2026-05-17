@@ -21,6 +21,7 @@ const TurfListing = () => {
       const params = Object.fromEntries(searchParams.entries());
       console.log('API Request params:', params);
       const res = await turfService.getTurfs(params);
+      console.log('GET /api/turfs response:', res);
       
       if (res && res.success) {
         const data = Array.isArray(res.data) ? res.data : [];
