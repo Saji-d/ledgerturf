@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import Navbar from '@/components/layout/Navbar';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import DashboardLayout from '@/components/layout/DashboardLayout';
+import ScrollToTop from '@/components/common/ScrollToTop';
 
 // Pages
 import Home from '@/pages/Home';
@@ -27,6 +28,7 @@ const DashboardRedirect = () => {
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         {/* Public Routes with Navbar */}
         <Route element={<><Navbar /><Outlet /></>}>
