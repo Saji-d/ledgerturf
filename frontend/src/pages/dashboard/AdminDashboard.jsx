@@ -46,6 +46,10 @@ const AdminDashboard = () => {
         turfService.getTurfs({ status: 'approved', limit: 1 })
       ]);
       
+      console.log('AdminDashboard - Pending Turfs raw:', turfsRes);
+      console.log('AdminDashboard - Stats raw:', statsRes.data);
+      console.log('AdminDashboard - Users raw:', usersRes.data);
+      
       setPendingTurfs(turfsRes.data);
       setStats({
         ...statsRes.data.data,

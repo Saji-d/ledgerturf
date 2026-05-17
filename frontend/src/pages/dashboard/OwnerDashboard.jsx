@@ -54,7 +54,9 @@ const OwnerDashboard = () => {
         turfService.getTurfs({ owner: user.id }),
         bookingService.getBookings()
       ]);
-      console.log('OwnerDashboard fetch results:', { turfs: turfsRes, bookings: bookingsRes });
+      console.log('OwnerDashboard - Turfs raw:', turfsRes);
+      console.log('OwnerDashboard - Bookings raw:', bookingsRes);
+      
       setTurfs(turfsRes.data);
       setBookings(bookingsRes.data);
     } catch (error) {

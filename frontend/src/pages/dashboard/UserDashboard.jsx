@@ -18,7 +18,10 @@ const UserDashboard = () => {
   const fetchBookings = async () => {
     try {
       const res = await bookingService.getBookings();
-      setBookings(res.data);
+      console.log('UserDashboard - Bookings raw:', res);
+      if (res && res.success) {
+        setBookings(res.data);
+      }
     } catch (error) {
       console.error(error);
     } finally {

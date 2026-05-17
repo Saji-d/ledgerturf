@@ -20,15 +20,15 @@ const TurfListing = () => {
     try {
       const params = Object.fromEntries(searchParams.entries());
       console.log('API Request params:', params);
-      const res = await turfService.getTurfs(params);
-      console.log('GET /api/turfs response:', res);
+      const data = await turfService.getTurfs(params);
+      console.log('GET /api/turfs response:', data);
       
-      if (res && res.success) {
-        const data = Array.isArray(res.data) ? res.data : [];
-        console.log(`API Success: fetched ${data.length} turfs`);
-        setTurfs(data);
+      if (data && data.success) {
+        const turfArray = Array.isArray(data.data) ? data.data : [];
+        console.log(`API Success: fetched ${turfArray.length} turfs`);
+        setTurfs(turfArray);
       } else {
-        console.warn('API Success but data invalid:', res);
+        console.warn('API Success but data invalid:', data);
         setTurfs([]);
       }
     } catch (error) {

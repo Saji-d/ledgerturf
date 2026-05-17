@@ -16,8 +16,9 @@ const Home = () => {
       try {
         console.log('Fetching featured turfs for homepage...');
         const res = await turfService.getTurfs({ limit: 3 });
-        console.log('Homepage Featured Turfs API Response:', res);
+        console.log('Homepage Featured Turfs API Response (raw):', res);
         if (res.success) {
+          console.log('Setting Featured Turfs with:', res.data);
           setFeaturedTurfs(res.data);
         }
       } catch (err) {
