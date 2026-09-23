@@ -32,9 +32,9 @@
 
 ## 📖 Overview
 
-LedgerTurf is a high-performance, production-ready MERN stack application tailored for the sports community in Dhaka, Bangladesh. It bridges the gap between turf owners and athletes by providing a seamless, real-time booking experience, advanced management dashboards, and intelligent discovery tools.
+LedgerTurf is a MERN stack application, deployed on Vercel, for the sports community in Dhaka, Bangladesh. It bridges the gap between turf owners and athletes by providing a seamless booking experience, advanced management dashboards, and intelligent discovery tools.
 
-Built with a rigorous focus on **concurrency safety**, **spatial search capabilities**, and **modern UX design**, LedgerTurf transforms how sports venues are discovered, managed, and reserved.
+Built with a focus on **time-zone-correct booking**, **map-based discovery**, and **modern UX design**, LedgerTurf transforms how sports venues are discovered, managed, and reserved.
 
 ---
 
@@ -44,7 +44,7 @@ LedgerTurf serves three distinct user roles with dedicated experiences:
 
 ### ⚽ For Players
 * **Smart Discovery**: Advanced filtering by neighborhood (Uttara, Banani, Gulshan, etc.), sport type, and hourly rate.
-* **Real-Time Booking**: Slot-based reservation management with dynamic time validation synchronized to Bangladesh Time (UTC+6).
+* **Slot Booking**: Slot-based reservation management with dynamic time validation synchronized to Bangladesh Time (UTC+6).
 * **Night Owl Mode**: Specialized discovery interface for venues offering late-night slots and elite floodlighting.
 * **Interactive Maps**: Integrated Google Maps for precise location tracking and seamless navigation.
 
@@ -81,7 +81,7 @@ The platform follows a highly modular, monorepo-style architecture optimized for
 * **Frontend SPA**: Communicates securely with the backend via a centralized, interceptor-equipped Axios service layer.
 * **RESTful API**: Organized strictly by domain (Controllers, Models, Middleware, Routes) promoting clear separation of concerns.
 * **RBAC Security**: Enforces strict Role-Based Access Control ensuring isolated data access for Players, Owners, and Admins.
-* **Spatial Processing**: Leverages MongoDB's native `$geoWithin` and `$centerSphere` operators for lightning-fast location-based queries.
+* **Spatial Processing**: Turf locations are stored as GeoJSON with a MongoDB `2dsphere` index. A `$geoWithin` / `$centerSphere` radius search is implemented but currently disabled in the deployed build for Vercel stability.
 
 ---
 
@@ -167,7 +167,7 @@ LedgerTurf is actively deployed and optimized for **Vercel**.
 ## 🧩 Challenges & Solutions
 
 * **Timezone Synchronization**: Solved critical booking conflicts by enforcing absolute `UTC+6` time calculations exclusively on the backend, guaranteeing consistent availability slots regardless of the client's local timezone.
-* **Booking Concurrency**: Mitigated race conditions during high-traffic reservations by implementing atomic MongoDB queries and pre-flight availability validations prior to confirming transactions.
+* **Booking Conflicts**: Bookings run an overlap pre-check before a MongoDB transaction writes them. Known gap: the check is not bound to the transaction session and there is no unique index yet, so two simultaneous requests for the same slot can both succeed. A unique index or an atomic slot claim is the planned fix.
 * **Serverless SPA Routing**: Overcame deep-link 404 errors on Vercel by utilizing custom rewrite rules that effectively bridge the gap between static asset serving and dynamic API routes.
 
 ---
@@ -175,9 +175,9 @@ LedgerTurf is actively deployed and optimized for **Vercel**.
 
 ## 🌟 Project Highlights
 
-- Production-ready MERN architecture optimized for scalability
-- Real-time slot booking with concurrency-safe validation
-- Geo-spatial venue discovery powered by MongoDB indexing
+- MERN architecture deployed on Vercel
+- Slot booking with overlap checks and UTC+6-aware time validation
+- Map-based venue discovery with Google Maps (2dsphere radius search currently disabled)
 - Role-based dashboards for Players, Owners, and Admins
 - Fully deployed full-stack platform on Vercel
 - Modern responsive UI with smooth micro-interactions
